@@ -22,15 +22,7 @@ class VolunteerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>$this->id,
-            'name'=>$this->user->name,
-            'email'=>$this->user->email,
-            'role'=>$this->user->role,
-            'logo'=>$this->user->logo,
-            'desc'=>$this->desc,
-            'address'=>$this->address,
-            'phone'=>$this->phone,
-            'isApproved'=>$this->isApproved,
+
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\PostRequest;
 
 class CategoryRequest extends FormRequest
 {
@@ -23,9 +22,6 @@ class CategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>$this->id,
-            'category'=>$this->category,
-            'article'=>PostRequest::collection($this->articles()->paginate(10))
         ];
     }
 }

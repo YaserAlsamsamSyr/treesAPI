@@ -2,13 +2,17 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 
-Route::middleware('allow')->prefix('admin')->group(function(){
+Route::get('/', function () {
+    return ['message' => "trees system"];
+});
 
+Route::middleware('allow')->prefix('admin')->group(function(){
+    
     Route::post('/login',[AdminController::class,'adminLogin']);
-    Route::post('/AssAdmin/login',[AdminController::class,'adminAssLogin']);
+    Route::post('/assAdmin/login',[AdminController::class,'adminAssLogin']);
 
     Route::middleware(['auth:sanctum','abilities:admin'])->group(function(){
-        
+       
         Route::get('/getAllAdminAss',[AdminController::class,'getAllAdminAss'])->middleware('isAdmin');
         Route::get('/getAllVolunteersWaiting',[AdminController::class,'getAllVolunteersWaiting']);
         Route::get('/getAllVolunteers',[AdminController::class,'getAllVolunteers']);
@@ -23,5 +27,13 @@ Route::middleware('allow')->prefix('admin')->group(function(){
 
         Route::post('/approvePlanOrVolun',[AdminController::class,'approvePlanOrVolun']);
         Route::post('/assignToVolunteer',[AdminController::class,'assignToVolunteer']);
+        Route::post('/createAdminAss',[AdminController::class,'createAdminAss']);
+        Route::post('/createAdmin',[AdminController::class,'createAdmin'])->middleware('isAdmin');
+        Route::post('/createAssAdmin',[AdminController::class,'createAssAdmin'])->middleware('isAdmin');
+
+        Route::delete('/deleteAssAdmin/{id}',[AdminController::class,'deleteAssAdmin'])->middleware('isAdmin');
+
+        Route::post('/updateAssAdmin/{id}',[AdminController::class,'updateAssAdmin'])->middleware('isAdmin');
+
     });
 });

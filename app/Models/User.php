@@ -9,12 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\Planstore;
 use App\Models\Volunteer;
 use App\Models\Admin;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-
+    use HasFactory, Notifiable,HasApiTokens;
     /**
      * The attributes that are mass assignable.
      *

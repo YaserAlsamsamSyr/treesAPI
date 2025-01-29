@@ -7,18 +7,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\ImageResource;
 use App\Http\Resources\PlantsStoreResource;
 use App\Http\Resources\VolunteerResource;
-use App\Http\Resources\AdminassResource;
 use App\Http\Resources\AdvertisementsResource;
 use App\Http\Resources\WorkResource;
 use App\Http\Resources\CategoryResource;
-use App\Models\User;
 use App\Models\Volunteer;
 use App\Models\Planstore;
 use App\Models\Advertisement;
 use App\Models\Work;
 use App\Models\Category;
 
-class AdminResource extends JsonResource
+class AssAdminLogInResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -29,7 +27,7 @@ class AdminResource extends JsonResource
     {
         return [
             'profile'=>[
-                'id'=>$this->id,
+                'id'=>$this->admin->id,
                 'name'=>$this->name,
                 'email'=>$this->email,
                 'logo'=>$this->logo,
@@ -40,14 +38,14 @@ class AdminResource extends JsonResource
                 'phone'=>$this->admin->phone,
                 'images'=>ImageResource::collection($this->admin->images)
             ],
-            'adminAss'=>AdminassResource::collection(User::where('role','adminAss')->paginate(10)),
             'volunteerQue'=>VolunteerResource::collection(Volunteer::where('isApproved','pin')->paginate(10)),
             'allVolunterr'=>VolunteerResource::collection(Volunteer::where('isApproved','!=','pin')->paginate(10)),
             'allPlantsStore'=>PlantsStoreResource::collection(Planstore::where('isApproved','!=','pin')->paginate(10)),
             'plansStoreQue'=>PlantsStoreResource::collection(Planstore::where('isApproved','pin')->paginate(10)),
-            'treeQue'=>AdvertisementsResource::collection(Advertisement::where('volunteer_id',null)->paginate(10)),
-            'WorkQue'=>WorkResource::collection(Work::where('volunteer_id',null)->paginate(10)),
+            'treeQue'=>AdvertisementsResource::collection(Advertisement::where('volunteer_id','!=',null)->paginate(10)),
+            'WorkQue'=>WorkResource::collection(Work::where('volunteer_id','!=',null)->paginate(10)),
             'categories'=>CategoryResource::collection(Category::get())
+
         ];
     }
 }

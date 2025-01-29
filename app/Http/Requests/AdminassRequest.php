@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\ImageRequest;
 
 class AdminassRequest extends FormRequest
 {
@@ -23,16 +22,7 @@ class AdminassRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>$this->admin->id,
-            'name'=>$this->name,
-            'email'=>$this->email,
-            'logo'=>$this->logo,
-            'role'=>$this->role,
-            'orgName'=>$this->admin->orgName,
-            'desc'=>$this->admin->desc,
-            'address'=>$this->admin->address,
-            'phone'=>$this->admin->phone,
-            'images'=>ImageRequest::collection($this->admin->images)
+
         ];
     }
 }

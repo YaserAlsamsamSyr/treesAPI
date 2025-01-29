@@ -19,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'allow'=>\App\Http\Middleware\AllowMiddleware::class,
-            'isAdmin'=>\App\Http\Middleware\IsAdminMiddleware::class
+            'isAdmin'=>\App\Http\Middleware\IsAdminMiddleware::class,
+            'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class
         ]);
 
         //

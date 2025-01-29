@@ -14,6 +14,16 @@ class VolunteerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id'=>$this->id,
+            'name'=>$this->user->name,
+            'email'=>$this->user->email,
+            'role'=>$this->user->role,
+            'logo'=>$this->user->logo,
+            'desc'=>$this->desc,
+            'address'=>$this->address,
+            'phone'=>$this->phone,
+            'isApproved'=>$this->isApproved,
+        ];
     }
 }

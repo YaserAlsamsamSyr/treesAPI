@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules;
-use App\Models\User;
 
-class AdminRequest extends FormRequest
+class UpdateAdminRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,14 +23,13 @@ class AdminRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'name' => ['nullable', 'string', 'max:255'],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'logo'=>['nullable','image','mimes:jpeg,png,jpg'],
-            'orgName' => ['required', 'string', 'max:255'],
-            'desc' => ['required', 'string', 'max:700'],
-            'address' => ['required', 'string', 'max:500'],
-            'phone' => ['required', 'string', 'regex:/^[0-9]{7,15}$/'],
+            'orgName' => ['nullable', 'string', 'max:255'],
+            'desc' => ['nullable', 'string', 'max:700'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'phone' => ['nullable', 'string', 'regex:/^[0-9]{7,15}$/'],
             'imgs' => ['nullable','array'],
             'imgs.*' => ['nullable','image','mimes:jpeg,jpg,png'],
         ];

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\ImageRequest;
 
 class AdvertisementsRequest extends FormRequest
 {
@@ -23,12 +22,7 @@ class AdvertisementsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'=>$this->id,
-            'name'=>$this->name,
-            'desc'=>$this->desc,
-            'status'=>$this->status,
-            'images'=>ImageRequest::collection($this->images),
-            'plantsStoreName'=>$this->planstore->persone->name
+
         ];
     }
 }

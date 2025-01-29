@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\ImageResource;
 
-class WorkResource extends JsonResource
+class AdvertisementsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,9 +19,9 @@ class WorkResource extends JsonResource
             'id'=>$this->id,
             'name'=>$this->name,
             'desc'=>$this->desc,
-            'address'=>$this->address,
+            'status'=>$this->status,
             'images'=>ImageResource::collection($this->images),
-            'status'=>$this->status
+            'plantsStoreName'=>$this->planstore->persone->name
         ];
     }
 }
