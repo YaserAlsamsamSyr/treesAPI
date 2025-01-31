@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('rejectDesc')->nullable();
             $table->string('adminApproved')->nullable();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('admin_id')->references('id')->on('admins');
             $table->timestamps();
         });
     }

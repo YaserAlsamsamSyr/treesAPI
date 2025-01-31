@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules;
+use App\Models\User;
 
 class PlantsStoreRequest extends FormRequest
 {
@@ -22,6 +24,18 @@ class PlantsStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
- ];
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                'logo'=>['nullable','image','mimes:jpeg,png,jpg'],
+                'desc' => ['required', 'string', 'max:700'],
+                'address' => ['required', 'string', 'max:500'],
+                'phone' => ['required', 'string', 'regex:/^[0-9]{7,15}$/'],
+                'ownerName' => ['required', 'string', 'max:255'],
+                'openTime' => ['required', 'string', 'max:100'],
+                'closeTime' => ['required', 'string', 'max:100'],
+                'imgs' => ['nullable','array'],
+                'imgs.*' => ['nullable','image','mimes:jpeg,jpg,png'],
+        ];
     }
 }

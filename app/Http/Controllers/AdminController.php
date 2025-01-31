@@ -26,9 +26,11 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\UploadImageController;
 use App\Http\Requests\AdminRequest;
-use App\Http\Requests\UpdateAdminRequest;
 use App\Http\Requests\VolunteerRequest;
+use App\Http\Requests\PlantsStoreRequest;
+use App\Http\Requests\UpdateAdminRequest;
 use App\Http\Requests\UpdateVolunterRequest;
+use App\Http\Requests\UpdatePlantsStoreRequest;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -346,8 +348,8 @@ class AdminController extends Controller
                 $user[0]->logo=$imgName;
             }
             if($req->hasFile('imgs')){
-                (new UploadImageController())->deleteMultiImage($user[0]->images);
-                $user[0]->images->destroy();
+                (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
+                $user[0]->admin->images->destroy();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user[0]->admin->images()->saveMany($paths);
             }
@@ -421,6 +423,91 @@ class AdminController extends Controller
                 $user[0]->logo=$imgName;
             }
             $user[0]->volunteer->save();
+            $user[0]->save();
+            return response()->json(["message"=>"update success"],200);
+        } catch(Exception $err){
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    //planstore
+    public function createPlanstore(PlantsStoreRequest $req){
+           try{
+                $imgName="no image";
+                if($req->hasFile('logo'))
+                      $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $user = User::create([
+                    'name' => $req->name,
+                    'email' => $req->email,
+                    'password' => Hash::make($req->string('password')),
+                    'logo'=>$imgName,
+                    'role'=>'plan',
+                    'user_id'=>auth()->id()
+                ]);
+                $planstore=new Planstore();
+                $planstore->mac="no mac";
+                $planstore->ownerName=$req->ownerName;
+                $planstore->desc=$req->desc;
+                $planstore->address=$req->address;
+                $planstore->phone=$req->phone;
+                $planstore->openTime=$req->openTime;
+                $planstore->closeTime=$req->closeTime;
+                $planstore->isApproved="yes";
+                $planstore->rejectDesc="";
+                $planstore->adminApproved=auth()->user()->name;
+                $user->planstore()->save($planstore);
+                if($req->hasFile('imgs')){
+                    $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                    $user->planstore->images()->saveMany($paths);
+                }
+                return response()->json(["message"=>"create success"],201);
+           }catch(Exception $err){
+                 return response()->json(["message"=>$err->getMessage()],500);
+           }
+    }
+    public function deletePlanstore(string $id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                 return response()->json(["message"=>"id of planstore not correct"],422);
+            $user=User::where('role','plan')->where('id',$id)->get();
+            if(sizeof($user)==0)
+                return response()->json(["message"=>"this planstore not found"],404);
+            (new UploadImageController())->deleteLogoImage($user[0]->logo);
+            $user[0]->delete();          
+            return response()->json(["message"=>"delete success"],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }  
+    }
+    public function updatePlanstore(UpdatePlantsStoreRequest $req,string $id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of planstore not correct"],422);
+            $user=User::where('role','plan')->where('id',$id)->get();
+            if(sizeof($user)==0)
+                return response()->json(["message"=>"this planstore not found"],404);
+            $user[0]->name=$req->name??$user[0]->name;
+            if($req->password)
+                $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
+            $user[0]->planstore->desc=$req->desc??$user[0]->planstore->desc;
+            $user[0]->planstore->address=$req->address??$user[0]->planstore->address;
+            $user[0]->planstore->phone=$req->phone??$user[0]->planstore->phone;
+            $user[0]->planstore->ownerName=$req->ownerName??$user[0]->planstore->ownerName;
+            $user[0]->planstore->openTime=$req->openTime??$user[0]->planstore->openTime;
+            $user[0]->planstore->closeTime=$req->closeTime??$user[0]->planstore->closeTime;
+            if($req->hasFile('logo')){
+                (new UploadImageController())->deleteLogoImage($user[0]->logo);
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $user[0]->logo=$imgName;
+            }
+            if($req->hasFile('imgs')){
+                (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
+                $user[0]->planstore->images->destroy();
+                $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                $user[0]->planstore->images()->saveMany($paths);
+            }
+            $user[0]->planstore->save();
             $user[0]->save();
             return response()->json(["message"=>"update success"],200);
         } catch(Exception $err){

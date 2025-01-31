@@ -17,7 +17,7 @@ class PlantsStoreResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
+            'id'=>$this->persone->id,
             'name'=>$this->persone->name,
             'email'=>$this->persone->email,
             'role'=>$this->persone->role,
@@ -29,6 +29,8 @@ class PlantsStoreResource extends JsonResource
             'openTime'=>$this->openTime,
             'closeTime'=>$this->closeTime,
             'isApproved'=>$this->isApproved,
+            'rejectDesc'=>$this->rejectDesc,
+            'adminApproved'=>$this->adminApproved,
             'images'=>ImageResource::collection($this->images),
             'waiting_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','wait')->paginate(10)),
             'done_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','done')->paginate(10)),

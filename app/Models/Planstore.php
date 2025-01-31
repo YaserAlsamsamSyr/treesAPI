@@ -21,15 +21,11 @@ class Planstore extends Model
         'isApproved',
         'rejectDesc',
         'adminApproved',
-        'user_id',
-        'admin_id'
+        'user_id'
     ];
     // relation
     public function persone(){
         return $this->belongsTo(User::class,'user_id');
-    }
-    public function admin(){
-        return $this->belongsTo(Admin::class);
     }
     public function images(){
         return $this->hasMany(Image::class);

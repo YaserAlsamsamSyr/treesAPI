@@ -22,10 +22,7 @@ class Admin extends Model
     //relation
     public function person(){
         return $this->belongsTo(User::class,'user_id');
-    }
-    public function planstores(){
-        return $this->hasMany(Planstore::class);
-    }    
+    }  
     public function images(){
         return $this->hasMany(Image::class);
     }      
