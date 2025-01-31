@@ -27,6 +27,10 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\UploadImageController;
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\UpdateAdminRequest;
+use App\Http\Requests\VolunteerRequest;
+use App\Http\Requests\UpdateVolunterRequest;
+
+use function PHPUnit\Framework\isEmpty;
 
 class AdminController extends Controller
 {
@@ -274,6 +278,7 @@ class AdminController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
          }
     }
+    // AssAdmin
     public function createAssAdmin(AdminRequest $req){
             try{
                 $imgName="no image";
@@ -307,12 +312,12 @@ class AdminController extends Controller
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of AssAdmin not correct"],422);
-            $user=User::find($id);
-            if(!$user)
-                return response()->json(["message"=>"this user not found"],404);
-            (new UploadImageController())->deleteLogoImage($user->logo);
-            (new UploadImageController())->deleteMultiImage($user->images);
-            $user->delete();          
+            $user=User::where('role','adminAss')->where('id',$id)->get();
+            if(sizeof($user)==0)
+                return response()->json(["message"=>"this AssAdmin not found"],404);
+            (new UploadImageController())->deleteLogoImage($user[0]->logo);
+            (new UploadImageController())->deleteMultiImage($user[0]->images);
+            $user[0]->delete();          
             return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -323,33 +328,102 @@ class AdminController extends Controller
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of AssAdmin not correct"],422);
-            $user=User::find($id);
-            if(!$user)
+            $user=User::where('role','adminAss')->where('id',$id)->get();
+            if(sizeof($user)==0)
                 return response()->json(["message"=>"this AssAdmin not found"],404);
-            $user->name=$req->name??$user->name;
+            $user[0]->name=$req->name??$user[0]->name;
             if($req->password)
-                $user->password=Hash::make($req->string('password'))??$user->password;
+                $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
 
-            $user->admin->orgName=$req->orgName??$user->admin->orgName;
-            $user->admin->desc=$req->desc??$user->admin->desc;
-            $user->admin->address=$req->address??$user->admin->address;
-            $user->admin->phone=$req->phone??$user->admin->phone;
+            $user[0]->admin->orgName=$req->orgName??$user[0]->admin->orgName;
+            $user[0]->admin->desc=$req->desc??$user[0]->admin->desc;
+            $user[0]->admin->address=$req->address??$user[0]->admin->address;
+            $user[0]->admin->phone=$req->phone??$user[0]->admin->phone;
 
             if($req->hasFile('logo')){
-                (new UploadImageController())->deleteLogoImage($user->logo);
+                (new UploadImageController())->deleteLogoImage($user[0]->logo);
                 $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
-                $user->logo=$imgName;
+                $user[0]->logo=$imgName;
             }
             if($req->hasFile('imgs')){
-                (new UploadImageController())->deleteMultiImage($user->images);
-                $user->images->destroy();
+                (new UploadImageController())->deleteMultiImage($user[0]->images);
+                $user[0]->images->destroy();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
-                $user->admin->images()->saveMany($paths);
+                $user[0]->admin->images()->saveMany($paths);
             }
-            $user->admin->save();
-            $user->save();
+            $user[0]->admin->save();
+            $user[0]->save();
             return response()->json(["message"=>"update success"],200);
         }catch(Exception $err){
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    //volunteer
+    public function createVolunteer(VolunteerRequest $req){
+        try{
+            $imgName="no image";
+            if($req->hasFile('logo'))
+                  $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+            $user = User::create([
+                'name' => $req->name,
+                'email' => $req->email,
+                'password' => Hash::make($req->string('password')),
+                'logo'=>$imgName,
+                'role'=>'volun',
+                'user_id'=>auth()->id()
+            ]);
+            $volun=new Volunteer();
+            $volun->mac="no mac";
+            $volun->desc=$req->desc;
+            $volun->address=$req->address;
+            $volun->phone=$req->phone;
+            $volun->isApproved="yes";
+            $volun->rejectDesc="";
+            $volun->adminApproved=auth()->user()->name;
+            $user->volunteer()->save($volun);
+            return response()->json(["message"=>"create success"],201);
+        }catch(Exception $err){
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function deleteVolunteer(string $id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                 return response()->json(["message"=>"id of volunteer not correct"],422);
+            $user=User::where('role','volun')->where('id',$id)->get();
+            if(sizeof($user)==0)
+                return response()->json(["message"=>"this volunteer not found"],404);
+            (new UploadImageController())->deleteLogoImage($user[0]->logo);
+            $user[0]->delete();          
+            return response()->json(["message"=>"delete success"],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }  
+    }
+    public function updateVolunteer(UpdateVolunterRequest $req,string $id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of volunteer not correct"],422);
+            $user=User::where('role','volun')->where('id',$id)->get();
+            if(sizeof($user)==0)
+                return response()->json(["message"=>"this volunteer not found"],404);
+            $user[0]->name=$req->name??$user[0]->name;
+            if($req->password)
+                $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
+            $user[0]->volunteer->desc=$req->desc??$user[0]->volunteer->desc;
+            $user[0]->volunteer->address=$req->address??$user[0]->volunteer->address;
+            $user[0]->volunteer->phone=$req->phone??$user[0]->volunteer->phone;
+            if($req->hasFile('logo')){
+                (new UploadImageController())->deleteLogoImage($user[0]->logo);
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $user[0]->logo=$imgName;
+            }
+            $user[0]->volunteer->save();
+            $user[0]->save();
+            return response()->json(["message"=>"update success"],200);
+        } catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }

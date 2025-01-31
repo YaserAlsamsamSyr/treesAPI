@@ -28,10 +28,7 @@ class Admin extends Model
     }    
     public function images(){
         return $this->hasMany(Image::class);
-    }    
-    public function volunteers(){
-        return $this->hasMany(Volunteer::class);
-    }    
+    }      
     public function events(){
         return $this->hasMany(Event::class);
     }    

@@ -27,13 +27,15 @@ Route::middleware('allow')->prefix('admin')->group(function(){
 
         Route::post('/approvePlanOrVolun',[AdminController::class,'approvePlanOrVolun']);
         Route::post('/assignToVolunteer',[AdminController::class,'assignToVolunteer']);
-        Route::post('/createAdminAss',[AdminController::class,'createAdminAss']);
+        Route::post('/createVolunteer',[AdminController::class,'createVolunteer']);
         Route::post('/createAdmin',[AdminController::class,'createAdmin'])->middleware('isAdmin');
         Route::post('/createAssAdmin',[AdminController::class,'createAssAdmin'])->middleware('isAdmin');
+        Route::post('/updateAssAdmin/{id}',[AdminController::class,'updateAssAdmin'])->middleware('isAdmin');
+        Route::post('/updateVolunteer/{id}',[AdminController::class,'updateVolunteer']);
 
         Route::delete('/deleteAssAdmin/{id}',[AdminController::class,'deleteAssAdmin'])->middleware('isAdmin');
+        Route::delete('/deleteVolunteer/{id}',[AdminController::class,'deleteVolunteer']);
 
-        Route::post('/updateAssAdmin/{id}',[AdminController::class,'updateAssAdmin'])->middleware('isAdmin');
 
     });
 });

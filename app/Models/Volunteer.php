@@ -18,13 +18,9 @@ class Volunteer extends Model
     'isApproved',
     'rejectDesc',
     'adminApproved',
-    'user_id',
-    'admin_id'
+    'user_id'
    ];
    // relation
-   public function admin(){
-    return $this->belongsTo(Admin::class);
-   }
    public function user(){
     return $this->belongsTo(User::class);
    }

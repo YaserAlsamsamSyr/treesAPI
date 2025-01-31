@@ -15,7 +15,7 @@ class VolunteerResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
+            'id'=>$this->user->id,
             'name'=>$this->user->name,
             'email'=>$this->user->email,
             'role'=>$this->user->role,
@@ -24,6 +24,8 @@ class VolunteerResource extends JsonResource
             'address'=>$this->address,
             'phone'=>$this->phone,
             'isApproved'=>$this->isApproved,
+            'rejectDesc'=>$this->rejectDesc,
+            'adminApproved'=>$this->adminApproved
         ];
     }
 }
