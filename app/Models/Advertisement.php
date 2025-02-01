@@ -13,6 +13,7 @@ class Advertisement extends Model
         'name',
         'desc',
         'status',
+        'plantsStoreName',
         'planstore_id',
         'volunteer_id'
     ];

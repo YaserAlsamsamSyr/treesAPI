@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('desc');
             $table->string('status')->default("متوفر");
+            $table->string('plantsStoreName');
             $table->foreignId("planstore_id")->references('id')->nullable()->on('planstores');
             $table->foreignId("volunteer_id")->references('id')->nullable()->on('volunteers');
             $table->timestamps();

@@ -29,15 +29,18 @@ Route::middleware('allow')->prefix('admin')->group(function(){
         Route::post('/assignToVolunteer',[AdminController::class,'assignToVolunteer']);
         Route::post('/createVolunteer',[AdminController::class,'createVolunteer']);
         Route::post('/createPlanstore',[AdminController::class,'createPlanstore']);
+        Route::post('/createTree/{id}',[AdminController::class,'createTree']);
         Route::post('/createAdmin',[AdminController::class,'createAdmin'])->middleware('isAdmin');
         Route::post('/createAssAdmin',[AdminController::class,'createAssAdmin'])->middleware('isAdmin');
         Route::post('/updateAssAdmin/{id}',[AdminController::class,'updateAssAdmin'])->middleware('isAdmin');
         Route::post('/updateVolunteer/{id}',[AdminController::class,'updateVolunteer']);
         Route::post('/updatePlanstore/{id}',[AdminController::class,'updatePlanstore']);
+        Route::post('/updateTree/{id}',[AdminController::class,'updateTree']);
 
         Route::delete('/deleteAssAdmin/{id}',[AdminController::class,'deleteAssAdmin'])->middleware('isAdmin');
         Route::delete('/deleteVolunteer/{id}',[AdminController::class,'deleteVolunteer']);
         Route::delete('/deletePlanstore/{id}',[AdminController::class,'deletePlanstore']);
+        Route::delete('/deleteTree/{id}',[AdminController::class,'deleteTree']);
 
     });
 });

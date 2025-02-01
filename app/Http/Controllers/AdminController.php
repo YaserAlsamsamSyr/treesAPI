@@ -26,17 +26,16 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\UploadImageController;
 use App\Http\Requests\AdminRequest;
+use App\Http\Requests\AdvertisementsRequest;
 use App\Http\Requests\VolunteerRequest;
 use App\Http\Requests\PlantsStoreRequest;
 use App\Http\Requests\UpdateAdminRequest;
 use App\Http\Requests\UpdateVolunterRequest;
 use App\Http\Requests\UpdatePlantsStoreRequest;
-
-use function PHPUnit\Framework\isEmpty;
+use App\Http\Requests\UpdateAdvertisementsRequest;
 
 class AdminController extends Controller
 {
-    
     public function adminLogin(Request $req){
         try{
             $req->validate([
@@ -67,7 +66,6 @@ class AdminController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
           }
     }
-    //
     public function getAllAdminAss(Request $req){
             try{
                 $numItems=$req->per_page??10;
@@ -252,7 +250,6 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    //
     public function createAdmin(AdminRequest $req){
          try{
             $imgName="no image";
@@ -473,6 +470,10 @@ class AdminController extends Controller
             if(sizeof($user)==0)
                 return response()->json(["message"=>"this planstore not found"],404);
             (new UploadImageController())->deleteLogoImage($user[0]->logo);
+            (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
+            foreach ($user[0]->planstore->advertisements as $tree)
+                if($tree->status=="متوفر")
+                    $tree->status->delete();
             $user[0]->delete();          
             return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){
@@ -513,5 +514,67 @@ class AdminController extends Controller
         } catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
         }
+    }
+    //tree
+    public function createTree(AdvertisementsRequest $req,string $id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                 return response()->json(["message"=>"id of plantsstore not correct"],422);
+            $user=User::where('role','plan')->where('id',$id)->get();
+            if(sizeof($user)==0)
+                return response()->json(["message"=>"this planstore not found"],404);
+            $tree=new Advertisement();
+            $tree->name = $req->name;
+            $tree->plantsStoreName=$user[0]->name;
+            $tree->desc = $req->desc;
+            $tree->planstore_id=$user[0]->planstore->id;
+            $tree->save();
+            if($req->hasFile('images')){
+                $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
+                $tree->images()->saveMany($paths);
+            }
+            return response()->json(["message"=>"create success"],201);
+        }catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function deleteTree(string $id){
+        try{
+           $pattern = "/^[0-9]+$/";
+           if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of tree not correct"],422);
+           $tree=Advertisement::where('status','متوفر')->where('id',$id)->get();
+           if(sizeof($tree)==0)
+               return response()->json(["message"=>"this tree not found or can not delete it"],403);
+           (new UploadImageController())->deleteMultiImage($tree[0]->images);
+           $tree[0]->delete();          
+           return response()->json(["message"=>"delete success"],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }  
+    }
+    public function updateTree(UpdateAdvertisementsRequest $req,string $id){
+         try{
+             $pattern = "/^[0-9]+$/";
+             if(!preg_match($pattern, $id))
+                 return response()->json(["message"=>"id of tree not correct"],422);
+             $tree=Advertisement::where('status','متوفر')->where('id',$id)->get();
+             if(sizeof($tree)==0)
+                 return response()->json(["message"=>"this tree not found or can not update it"],404);
+             $tree[0]->name=$req->name??$tree[0]->name;
+             $tree[0]->desc=$req->desc??$tree[0]->desc;
+             $tree[0]->plantsStoreName=$req->plantsStoreName??$tree[0]->plantsStoreName;
+             if($req->hasFile('imgs')){
+                 (new UploadImageController())->deleteMultiImage($tree[0]->images);
+                 $tree[0]->images->destroy();
+                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                 $tree[0]->images()->saveMany($paths);
+             }
+             $tree[0]->save();
+             return response()->json(["message"=>"update success"],200);
+         } catch(Exception $err){
+             return response()->json(["message"=>$err->getMessage()],500);
+         }
     }
 }
