@@ -206,6 +206,46 @@ class AdminController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    public function getperson(string $id,string $type){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id not correct"],422);
+            $pattern = "/^[A-Za-z|\s]+$/";
+            if(!preg_match($pattern, $type))
+                return response()->json(["message"=>"type not correct"],422);
+            $data='';
+            if($type=='admin'){
+                $data=User::where('role','admin')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this person not found"],404);
+                $data=new AdminResource($data[0]);
+            }
+            else if($type=='adminAss'){
+                $data=User::where('role','adminAss')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this person not found"],404);
+                $data=new AdminassResource($data[0]);
+            }
+            else if($type=='volun'){
+                $data=User::where('role','volun')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this person not found"],404);
+                $data=new VolunteerResource($data[0]->volunteer);
+            }
+            else if($type=='plan'){
+                $data=User::where('role','plan')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this person not found"],404);
+                $data=new PlantsStoreResource($data[0]->planstore);
+            }
+            if(!$data)
+                return response()->json(['message'=>"this person not found"],404);
+            return response()->json($data,200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
     //approve and assign
     public function approvePlanOrVolun(Request $req){
         try{
