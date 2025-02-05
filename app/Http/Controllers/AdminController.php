@@ -7,6 +7,7 @@ use App\Http\Resources\WorkResource;
 use App\Http\Resources\AdminResource;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminassResource;
+use App\Http\Resources\TrafficResource;
 use App\Http\Resources\VolunteerResource;
 use App\Http\Resources\PlantsStoreResource;
 use App\Http\Resources\AssAdminLogInResource;
@@ -21,21 +22,28 @@ use App\Models\Volunteer;
 use App\Models\Planstore;
 use App\Models\Admin;
 use App\Models\Work;
+use App\Models\Event;
 use App\Models\User;
+use App\Models\Year;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\UploadImageController;
 use App\Http\Requests\AdminRequest;
+use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\AdvertisementsRequest;
+use App\Http\Requests\EventRequest;
 use App\Http\Requests\VolunteerRequest;
 use App\Http\Requests\PlantsStoreRequest;
 use App\Http\Requests\UpdateAdminRequest;
 use App\Http\Requests\UpdateVolunterRequest;
 use App\Http\Requests\UpdatePlantsStoreRequest;
 use App\Http\Requests\UpdateAdvertisementsRequest;
+use App\Http\Resources\EventResource;
+use Illuminate\Support\Carbon;
 
 class AdminController extends Controller
 {
+    //login
     public function adminLogin(Request $req){
         try{
             $req->validate([
@@ -66,6 +74,7 @@ class AdminController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
           }
     }
+    //get
     public function getAllAdminAss(Request $req){
             try{
                 $numItems=$req->per_page??10;
@@ -129,6 +138,75 @@ class AdminController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    public function getAdvertisementsQue(Request $req){
+        try{
+            $numItems=$req->per_page??10;
+            $data=AdvertisementsResource::collection(Advertisement::where('volunteer_id',null)->paginate($numItems));
+            return response()->json(['allAdvertisements'=>$data],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function getWorksQue(Request $req){
+        try{
+            $numItems=$req->per_page??10;
+            $data=WorkResource::collection(Work::where('volunteer_id',null)->paginate($numItems));
+            return response()->json(['allWorks'=>$data],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function getWorks(Request $req){
+        try {
+            $numItems=$req->per_page??10;
+            $waiting_works=WorkResource::collection(Work::where('status','wait')->paginate($numItems));
+            $done_works=WorkResource::collection(Work::where('status','done')->paginate($numItems));
+            $false_works=WorkResource::collection(Work::where('status','false')->paginate($numItems));
+            return response()->json([
+                'waiting_works'=>$waiting_works,
+                'done_works'=>$done_works,
+                'false_works'=>$false_works
+            ],200);  
+        } catch(Exception $err) {
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function getCategories(){
+        try{
+            $data=CategoryOnlyResource::collection(Category::get());
+            return response()->json(['allCategories'=>$data],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function getArticlesOfCategory(Request $req,$cat_id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $cat_id))
+                 return response()->json(["message"=>"id of category not correct"],422);
+            $numItems=$req->per_page??10;  
+            $data=PostResource::collection(Article::where('category_id',$cat_id)->paginate($numItems));
+            return response()->json(['allArticles'=>$data],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function getEvents(Request $req){
+        try {
+            $mytime = Carbon::now();
+            $all=Event::where('endDate','<=',$mytime->toDateString())->get();
+            foreach($all as $i){
+                (new UploadImageController())->deleteMultiImage($i->images);
+                $i->delete();
+            }
+            $numItems=$req->per_page??10;
+            $allEvents=EventResource::collection(Event::paginate($numItems));
+            return response()->json(['allEvents'=>$allEvents],200);  
+        } catch(Exception $err) {
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    //approve and assign
     public function approvePlanOrVolun(Request $req){
         try{
             // { 
@@ -165,39 +243,6 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getAdvertisementsQue(Request $req){
-        try{
-            $numItems=$req->per_page??10;
-            $data=AdvertisementsResource::collection(Advertisement::where('volunteer_id',null)->paginate($numItems));
-            return response()->json(['allAdvertisements'=>$data],200);
-        } catch(Exception $err){
-              return response()->json(["message"=>$err->getMessage()],500);
-        }
-    }
-    public function getWorksQue(Request $req){
-        try{
-            $numItems=$req->per_page??10;
-            $data=WorkResource::collection(Work::where('volunteer_id',null)->paginate($numItems));
-            return response()->json(['allWorks'=>$data],200);
-        } catch(Exception $err){
-              return response()->json(["message"=>$err->getMessage()],500);
-        }
-    }
-    public function getWorks(Request $req){
-        try {
-            $numItems=$req->per_page??10;
-            $waiting_works=WorkResource::collection(Work::where('status','wait')->paginate($numItems));
-            $done_works=WorkResource::collection(Work::where('status','done')->paginate($numItems));
-            $false_works=WorkResource::collection(Work::where('status','false')->paginate($numItems));
-            return response()->json([
-                'waiting_works'=>$waiting_works,
-                'done_works'=>$done_works,
-                'false_works'=>$false_works
-            ],200);  
-        } catch(Exception $err) {
-            return response()->json(["message"=>$err->getMessage()],500);
-        }
-    }
     public function assignToVolunteer(Request $req){
         try{
             // { 
@@ -230,26 +275,7 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getCategories(){
-        try{
-            $data=CategoryOnlyResource::collection(Category::get());
-            return response()->json(['allCategories'=>$data],200);
-        } catch(Exception $err){
-              return response()->json(["message"=>$err->getMessage()],500);
-        }
-    }
-    public function getArticlesOfCategory(Request $req,$cat_id){
-        try{
-            $pattern = "/^[0-9]+$/";
-            if(!preg_match($pattern, $cat_id))
-                 return response()->json(["message"=>"id of category not correct"],422);
-            $numItems=$req->per_page??10;  
-            $data=PostResource::collection(Article::where('category_id',$cat_id)->paginate($numItems));
-            return response()->json(['allArticles'=>$data],200);
-        } catch(Exception $err){
-              return response()->json(["message"=>$err->getMessage()],500);
-        }
-    }
+    //admin
     public function createAdmin(AdminRequest $req){
          try{
             $imgName="no image";
@@ -276,6 +302,41 @@ class AdminController extends Controller
          }catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
          }
+    }
+    public function updateAdmin(UpdateAdminRequest $req,string $id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                 return response()->json(["message"=>"id of admin not correct"],422);
+            $user=User::where('role','admin')->where('id',$id)->get();
+            if(sizeof($user)==0)
+                return response()->json(["message"=>"this admin not found"],404);
+            $user[0]->name=$req->name??$user[0]->name;
+            if($req->password)
+                $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
+
+            $user[0]->admin->orgName=$req->orgName??$user[0]->admin->orgName;
+            $user[0]->admin->desc=$req->desc??$user[0]->admin->desc;
+            $user[0]->admin->address=$req->address??$user[0]->admin->address;
+            $user[0]->admin->phone=$req->phone??$user[0]->admin->phone;
+
+            if($req->hasFile('logo')){
+                (new UploadImageController())->deleteLogoImage($user[0]->logo);
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $user[0]->logo=$imgName;
+            }
+            if($req->hasFile('imgs')){
+                (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
+                $user[0]->admin->images->destroy();
+                $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                $user[0]->admin->images()->saveMany($paths);
+            }
+            $user[0]->admin->save();
+            $user[0]->save();
+            return response()->json(["message"=>"update success"],200);
+        }catch(Exception $err){
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
     }
     // AssAdmin
     public function createAssAdmin(AdminRequest $req){
@@ -530,6 +591,8 @@ class AdminController extends Controller
             $tree->desc = $req->desc;
             $tree->planstore_id=$user[0]->planstore->id;
             $tree->save();
+            $user[0]->planstore->rate++;
+            $user[0]->planstore->save();
             if($req->hasFile('images')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
                 $tree->images()->saveMany($paths);
@@ -576,5 +639,134 @@ class AdminController extends Controller
          } catch(Exception $err){
              return response()->json(["message"=>$err->getMessage()],500);
          }
+    }
+    //category
+    public function createcategory(Request $req){
+        try{
+            $pattern = "/^[A-Za-z|\s]+$/";
+            if(!preg_match($pattern, $req->name))
+                 return response()->json(["message"=>"name not correct"],422);
+            $cat=new Category();
+            $cat->name=$req->name;
+            $cat->admin_id=auth()->user()->id;
+            $cat->save();
+            return response()->json(["message"=>"create success"],201);
+        }catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function deleteCategory(string $id){
+        try{
+           $pattern = "/^[0-9]+$/";
+           if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of category not correct"],422);
+           $cat=Category::where('id',$id)->get();
+           if(sizeof($cat)==0)
+               return response()->json(["message"=>"this category not found"],404);
+            $cat[0]->delete();
+           return response()->json(["message"=>"delete success"],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }  
+    }
+    public function updateCategory(Request $req,string $id){
+        try{
+           $pattern = "/^[0-9]+$/";
+           if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of category not correct"],422);
+           $pattern = "/^[A-Za-z|\s]+$/";
+           if(!preg_match($pattern, $req->name))
+                return response()->json(["message"=>"name not correct"],422);
+           $cat=Category::where('id',$id)->get();
+           if(sizeof($cat)==0)
+               return response()->json(["message"=>"this category not found"],404);
+           $cat[0]->name=$req->name;
+           $cat[0]->save();
+           return response()->json(["message"=>"update success"],200);
+        } catch(Exception $err){
+           return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    //articles
+    public function createArticles(ArticleRequest $req,string $id){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of category not correct"],422);
+            $cat=Category::where('id',$id)->get();
+            if(sizeof($cat)==0)
+                return response()->json(["message"=>"this category not found"],404);
+            $art=new Article();
+            $art->name=$req->name;
+            $art->title=$req->title;
+            $art->desc=$req->desc;
+            $art->category_id=$cat[0]->id;
+            $art->save();
+            if($req->hasFile('images')){
+                $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
+                $art->images()->saveMany($paths);
+            }
+            return response()->json(["message"=>"create success"],201);
+        }catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function deleteArticles(string $id){
+        try{
+           $pattern = "/^[0-9]+$/";
+           if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of article not correct"],422);
+           $art=Article::where('id',$id)->get();
+           if(sizeof($art)==0)
+               return response()->json(["message"=>"this article not found"],404);
+            $art[0]->delete();
+           return response()->json(["message"=>"delete success"],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }  
+    }
+    //traffic
+    public function getTraffic(){
+        try{
+            return response()->json(['traffic'=>TrafficResource::collection(Year::all())],200);
+        } catch(Exception $err){
+            return response()->json(['message'=>$err->getMessage(),422]);
+        }
+    }
+    //event
+    public function deleteEvent(string $id){
+        try{
+           $pattern = "/^[0-9]+$/";
+           if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of event not correct"],422);
+           $event=Event::where('id',$id)->get();
+           if(sizeof($event)==0)
+               return response()->json(["message"=>"this event not found"],404);
+            (new UploadImageController())->deleteMultiImage($event[0]->images);
+            $event[0]->delete();
+           return response()->json(["message"=>"delete success"],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }  
+    }
+    public function createEvent(EventRequest $req){
+        try{
+            $event=new Event();
+            $event->title=$req->title;
+            $event->address=$req->address;
+            $event->desc=$req->desc;
+            $event->orgName=$req->orgName;
+            $event->startDate=$req->startDate;
+            $event->endDate=$req->endDate;
+            $event->admin_id=auth()->id();
+            $event->save();
+            if($req->hasFile('images')){
+                $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
+                $event->images()->saveMany($paths);
+            }
+            return response()->json(["message"=>"create success"],201);
+        }catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
     }
 }

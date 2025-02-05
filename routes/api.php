@@ -24,6 +24,8 @@ Route::middleware('allow')->prefix('admin')->group(function(){
         Route::get('/getWorks',[AdminController::class,'getWorks']);
         Route::get('/getCategories',[AdminController::class,'getCategories']);
         Route::get('/getArticlesOfCategory/{id}',[AdminController::class,'getArticlesOfCategory']);
+        Route::get('/getTraffic',[AdminController::class,'getTraffic']);
+        Route::get('/getEvents',[AdminController::class,'getEvents']);
 
         Route::post('/approvePlanOrVolun',[AdminController::class,'approvePlanOrVolun']);
         Route::post('/assignToVolunteer',[AdminController::class,'assignToVolunteer']);
@@ -36,11 +38,13 @@ Route::middleware('allow')->prefix('admin')->group(function(){
         Route::post('/updateVolunteer/{id}',[AdminController::class,'updateVolunteer']);
         Route::post('/updatePlanstore/{id}',[AdminController::class,'updatePlanstore']);
         Route::post('/updateTree/{id}',[AdminController::class,'updateTree']);
+        Route::post('/createEvent',[AdminController::class,'createEvent']);
 
         Route::delete('/deleteAssAdmin/{id}',[AdminController::class,'deleteAssAdmin'])->middleware('isAdmin');
         Route::delete('/deleteVolunteer/{id}',[AdminController::class,'deleteVolunteer']);
         Route::delete('/deletePlanstore/{id}',[AdminController::class,'deletePlanstore']);
         Route::delete('/deleteTree/{id}',[AdminController::class,'deleteTree']);
+        Route::delete('/deleteEvent/{id}',[AdminController::class,'deleteEvent']);
 
     });
 });

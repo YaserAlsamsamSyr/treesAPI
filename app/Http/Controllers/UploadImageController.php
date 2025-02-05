@@ -9,18 +9,18 @@ use Illuminate\Support\Facades\File;
 class UploadImageController extends Controller
 {
     public function uploadeImage($img){
-        $imageName = time().'.'.$img->getClientOriginalExtension();
+        $imageName = time().'.'.$img->getClientOriginalName().'-'.$img->getClientOriginalExtension();
         $img->move(public_path('logo'), $imageName);
         return asset('/logo/' . $imageName);
     }
     public function uploadMultiImages($images){
-        $images=array();
+        $img=array();
         foreach($images as $file){
-            $name= time().'.'.$file->getClientOriginalExtension();
+            $name= time().'.'.$file->getClientOriginalName().'-'.$file->getClientOriginalExtension();
             $file->move(public_path('images'),$name);
-            $images[]=(new Image(['img'=>asset('/images/' . $name)]));
+            $img[]=(new Image(['img'=>asset('/images/' . $name)]));
         }
-        return $images;
+        return $img;
     }
     public function deleteLogoImage($img){
         if($img!="no image"){

@@ -4,9 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\ImageResource;
+use App\Http\Resources\MonthResource;
 
-class PostResource extends JsonResource
+class TrafficResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +16,8 @@ class PostResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'=>$this->id,
-            'name'=>$this->name,
-            'title'=>$this->title,
-            'desc'=>$this->desc,
-            'createdAt'=>$this->created_at,
-            'images'=>ImageResource::collection($this->images)
+            'year'=>$this->year,
+            'months'=>MonthResource::collection($this->months) 
         ];
     }
 }

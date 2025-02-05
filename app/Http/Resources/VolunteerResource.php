@@ -25,7 +25,8 @@ class VolunteerResource extends JsonResource
             'phone'=>$this->phone,
             'isApproved'=>$this->isApproved,
             'rejectDesc'=>$this->rejectDesc,
-            'adminApproved'=>$this->adminApproved
+            'adminApproved'=>$this->adminApproved,
+            'rate'=>$this->rate
         ];
     }
 }

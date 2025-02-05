@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\ImageResource;
 
-class PostResource extends JsonResource
+class EventResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,10 +17,12 @@ class PostResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'name'=>$this->name,
             'title'=>$this->title,
+            'address'=>$this->address,
             'desc'=>$this->desc,
-            'createdAt'=>$this->created_at,
+            'startDate'=>$this->startDate,
+            'endDate'=>$this->endDate,
+            'orgName'=>$this->orgName,
             'images'=>ImageResource::collection($this->images)
         ];
     }

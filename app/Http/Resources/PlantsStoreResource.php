@@ -31,6 +31,7 @@ class PlantsStoreResource extends JsonResource
             'isApproved'=>$this->isApproved,
             'rejectDesc'=>$this->rejectDesc,
             'adminApproved'=>$this->adminApproved,
+            'rate'=>$this->rate,
             'images'=>ImageResource::collection($this->images),
             'waiting_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','wait')->paginate(10)),
             'done_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','done')->paginate(10)),

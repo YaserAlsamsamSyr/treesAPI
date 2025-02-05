@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('phone');
             $table->string('isApproved')->default("pin");
+            $table->string('rate')->default(0);
             $table->string('rejectDesc')->nullable();
             $table->string('adminApproved')->nullable();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');

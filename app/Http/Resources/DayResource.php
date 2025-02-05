@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\ImageResource;
 
-class PostResource extends JsonResource
+class DayResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,13 +14,13 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $firstTime=$allTime=0;
+        $firstTime+=$this->traffics()->where('firstTime',1)->count();
+        $allTime+=$this->traffics()->count();
         return [
-            'id'=>$this->id,
-            'name'=>$this->name,
-            'title'=>$this->title,
-            'desc'=>$this->desc,
-            'createdAt'=>$this->created_at,
-            'images'=>ImageResource::collection($this->images)
+            'day'=>$this->day,
+            'firstTime'=>$firstTime,
+            'allTime'=>$allTime
         ];
     }
 }

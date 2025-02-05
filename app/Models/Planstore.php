@@ -21,7 +21,8 @@ class Planstore extends Model
         'isApproved',
         'rejectDesc',
         'adminApproved',
-        'user_id'
+        'user_id',
+        'rate'
     ];
     // relation
     public function persone(){
