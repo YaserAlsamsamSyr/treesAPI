@@ -35,6 +35,7 @@ Route::middleware('allow')->prefix('admin')->group(function(){
         Route::post('/createAdmin',[AdminController::class,'createAdmin'])->middleware('isAdmin');
         Route::post('/createAssAdmin',[AdminController::class,'createAssAdmin'])->middleware('isAdmin');
         Route::post('/updateAssAdmin/{id}',[AdminController::class,'updateAssAdmin'])->middleware('isAdmin');
+        Route::post('/updateAdmin/{id}',[AdminController::class,'updateAdmin'])->middleware('isAdmin');
         Route::post('/updateVolunteer/{id}',[AdminController::class,'updateVolunteer']);
         Route::post('/updatePlanstore/{id}',[AdminController::class,'updatePlanstore']);
         Route::post('/updateTree/{id}',[AdminController::class,'updateTree']);
