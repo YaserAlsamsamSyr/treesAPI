@@ -15,6 +15,7 @@ class Event extends Model
         'startDate',
         'endDate',
         'orgName',
+        'orgOwnerName',
         'admin_id'
     ];
     //relation

@@ -26,6 +26,7 @@ class EventRequest extends FormRequest
             'address' => ['required', 'string', 'max:400'],
             'desc' => ['required', 'string', 'max:500'],
             'orgName' => ['required', 'string', 'max:255'],
+            'orgOwnerName' => ['required', 'string', 'max:255'],
             'startDate' => ['required', 'string', 'max:255'],
             'endDate' => ['required', 'string', 'max:255'],
             'images' => ['nullable','array'],

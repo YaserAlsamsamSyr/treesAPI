@@ -218,29 +218,35 @@ class AdminController extends Controller
             if($type=='admin'){
                 $data=User::where('role','admin')->where('id',$id)->get();
                 if(sizeof($data)==0)
-                       return response()->json(['message'=>"this person not found"],404);
+                       return response()->json(['message'=>"this admin not found"],404);
                 $data=new AdminResource($data[0]);
             }
             else if($type=='adminAss'){
                 $data=User::where('role','adminAss')->where('id',$id)->get();
                 if(sizeof($data)==0)
-                       return response()->json(['message'=>"this person not found"],404);
+                       return response()->json(['message'=>"this assAdmin not found"],404);
                 $data=new AdminassResource($data[0]);
             }
             else if($type=='volun'){
                 $data=User::where('role','volun')->where('id',$id)->get();
                 if(sizeof($data)==0)
-                       return response()->json(['message'=>"this person not found"],404);
+                       return response()->json(['message'=>"this volunteer not found"],404);
                 $data=new VolunteerResource($data[0]->volunteer);
             }
             else if($type=='plan'){
                 $data=User::where('role','plan')->where('id',$id)->get();
                 if(sizeof($data)==0)
-                       return response()->json(['message'=>"this person not found"],404);
+                       return response()->json(['message'=>"this planstore not found"],404);
                 $data=new PlantsStoreResource($data[0]->planstore);
             }
+            else if($type=='event'){
+                $data=Event::where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this event not found"],404);
+                $data=new EventResource($data[0]);
+            }
             if(!$data)
-                return response()->json(['message'=>"this person not found"],404);
+                return response()->json(['message'=>"this type not found"],404);
             return response()->json($data,200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -367,7 +373,7 @@ class AdminController extends Controller
             }
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
-                $user[0]->admin->images->destroy();
+                $user[0]->admin->images->delete();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user[0]->admin->images()->saveMany($paths);
             }
@@ -447,7 +453,7 @@ class AdminController extends Controller
             }
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
-                $user[0]->admin->images->destroy();
+                $user[0]->admin->images->delete();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user[0]->admin->images()->saveMany($paths);
             }
@@ -463,15 +469,26 @@ class AdminController extends Controller
         try{
             $imgName="no image";
             if($req->hasFile('logo'))
-                  $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
-            $user = User::create([
-                'name' => $req->name,
-                'email' => $req->email,
-                'password' => Hash::make($req->string('password')),
-                'logo'=>$imgName,
-                'role'=>'volun',
-                'user_id'=>auth()->id()
-            ]);
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+            if($req->email)
+                $user = User::create([
+                    'name' => $req->name,
+                    'email' => $req->email,
+                    'userName' => $req->userName,
+                    'password' => Hash::make($req->string('password')),
+                    'logo'=>$imgName,
+                    'role'=>'volun',
+                    'user_id'=>auth()->id()
+                ]);
+            else
+                $user = User::create([
+                    'name' => $req->name,
+                    'userName' => $req->userName,
+                    'password' => Hash::make($req->string('password')),
+                    'logo'=>$imgName,
+                    'role'=>'volun',
+                    'user_id'=>auth()->id()
+                ]);
             $volun=new Volunteer();
             $volun->mac="no mac";
             $volun->desc=$req->desc;
@@ -510,6 +527,7 @@ class AdminController extends Controller
             if(sizeof($user)==0)
                 return response()->json(["message"=>"this volunteer not found"],404);
             $user[0]->name=$req->name??$user[0]->name;
+            $user[0]->email=$req->email??$user[0]->email;
             if($req->password)
                 $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
             $user[0]->volunteer->desc=$req->desc??$user[0]->volunteer->desc;
@@ -533,14 +551,25 @@ class AdminController extends Controller
                 $imgName="no image";
                 if($req->hasFile('logo'))
                       $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
-                $user = User::create([
-                    'name' => $req->name,
-                    'email' => $req->email,
-                    'password' => Hash::make($req->string('password')),
-                    'logo'=>$imgName,
-                    'role'=>'plan',
-                    'user_id'=>auth()->id()
-                ]);
+                if($req->email)
+                    $user = User::create([
+                        'name' => $req->name,
+                        'email' => $req->email,
+                        'userName' => $req->userName,
+                        'password' => Hash::make($req->string('password')),
+                        'logo'=>$imgName,
+                        'role'=>'plan',
+                        'user_id'=>auth()->id()
+                    ]);
+                else
+                    $user = User::create([
+                        'name' => $req->name,
+                        'userName' => $req->userName,
+                        'password' => Hash::make($req->string('password')),
+                        'logo'=>$imgName,
+                        'role'=>'plan',
+                        'user_id'=>auth()->id()
+                    ]);
                 $planstore=new Planstore();
                 $planstore->mac="no mac";
                 $planstore->ownerName=$req->ownerName;
@@ -590,6 +619,7 @@ class AdminController extends Controller
             if(sizeof($user)==0)
                 return response()->json(["message"=>"this planstore not found"],404);
             $user[0]->name=$req->name??$user[0]->name;
+            $user[0]->email=$req->email??$user[0]->email;
             if($req->password)
                 $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
             $user[0]->planstore->desc=$req->desc??$user[0]->planstore->desc;
@@ -605,7 +635,7 @@ class AdminController extends Controller
             }
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
-                $user[0]->planstore->images->destroy();
+                $user[0]->planstore->images->delete();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user[0]->planstore->images()->saveMany($paths);
             }
@@ -670,7 +700,7 @@ class AdminController extends Controller
              $tree[0]->plantsStoreName=$req->plantsStoreName??$tree[0]->plantsStoreName;
              if($req->hasFile('imgs')){
                  (new UploadImageController())->deleteMultiImage($tree[0]->images);
-                 $tree[0]->images->destroy();
+                 $tree[0]->images->delete();
                  $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                  $tree[0]->images()->saveMany($paths);
              }
@@ -796,6 +826,7 @@ class AdminController extends Controller
             $event->address=$req->address;
             $event->desc=$req->desc;
             $event->orgName=$req->orgName;
+            $event->orgOwnerName=$req->orgOwnerName;
             $event->startDate=$req->startDate;
             $event->endDate=$req->endDate;
             $event->admin_id=auth()->id();

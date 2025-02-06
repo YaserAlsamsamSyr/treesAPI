@@ -20,6 +20,7 @@ class PlantsStoreResource extends JsonResource
             'id'=>$this->persone->id,
             'name'=>$this->persone->name,
             'email'=>$this->persone->email,
+            'userName'=>$this->persone->userName,
             'role'=>$this->persone->role,
             'logo'=>$this->persone->logo,
             'address'=>$this->address,

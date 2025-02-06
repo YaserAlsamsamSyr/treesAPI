@@ -18,6 +18,7 @@ class VolunteerResource extends JsonResource
             'id'=>$this->user->id,
             'name'=>$this->user->name,
             'email'=>$this->user->email,
+            'userName'=>$this->user->userName,
             'role'=>$this->user->role,
             'logo'=>$this->user->logo,
             'desc'=>$this->desc,

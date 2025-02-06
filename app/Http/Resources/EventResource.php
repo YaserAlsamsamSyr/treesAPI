@@ -23,6 +23,7 @@ class EventResource extends JsonResource
             'startDate'=>$this->startDate,
             'endDate'=>$this->endDate,
             'orgName'=>$this->orgName,
+            'orgOwnerName'=>$this->orgOwnerName,
             'images'=>ImageResource::collection($this->images)
         ];
     }
