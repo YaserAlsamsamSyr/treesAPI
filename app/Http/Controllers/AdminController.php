@@ -96,8 +96,9 @@ class AdminController extends Controller
     public function getAllVolunteers(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=VolunteerResource::collection(Volunteer::where('isApproved','!=','pin')->paginate($numItems));
-            return response()->json(['allVolunteers'=>$data],200);
+            $yes=VolunteerResource::collection(Volunteer::where('isApproved','yes')->paginate($numItems));
+            $no=VolunteerResource::collection(Volunteer::where('isApproved','no')->paginate($numItems));
+            return response()->json(['yesVolunteers'=>$yes,'noVolunteers'=>$no],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }
@@ -114,8 +115,9 @@ class AdminController extends Controller
     public function getAllPlanstores(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=PlantsStoreResource::collection(Planstore::where('isApproved','!=','pin')->paginate($numItems));
-            return response()->json(['allPlanstores'=>$data],200);
+            $yes=PlantsStoreResource::collection(Planstore::where('isApproved','yes')->paginate($numItems));
+            $no=PlantsStoreResource::collection(Planstore::where('isApproved','no')->paginate($numItems));
+            return response()->json(['yesPlan'=>$yes,'noPlan'=>$no],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }
@@ -126,13 +128,15 @@ class AdminController extends Controller
             if(!preg_match($pattern, $planstore_id))
                  return response()->json(["message"=>"id of planstore not correct"],422);
             $numItems=$req->per_page??10;
+            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','pin')->paginate($numItems));
             $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','wait')->paginate($numItems));
             $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','done')->paginate($numItems));
             $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','false')->paginate($numItems));
             return response()->json([
                 'waiting_trees'=>$waiting_trees,
                 'done_trees'=>$done_trees,
-                'false_trees'=>$false_trees
+                'false_trees'=>$false_trees,
+                'pinding_trees'=>$pinding_trees
             ],200);  
         } catch(Exception $err) {
             return response()->json(["message"=>$err->getMessage()],500);
@@ -160,12 +164,14 @@ class AdminController extends Controller
         try {
             $numItems=$req->per_page??10;
             $waiting_works=WorkResource::collection(Work::where('status','wait')->paginate($numItems));
+            $pindding_works=WorkResource::collection(Work::where('status','pin')->paginate($numItems));
             $done_works=WorkResource::collection(Work::where('status','done')->paginate($numItems));
             $false_works=WorkResource::collection(Work::where('status','false')->paginate($numItems));
             return response()->json([
                 'waiting_works'=>$waiting_works,
                 'done_works'=>$done_works,
-                'false_works'=>$false_works
+                'false_works'=>$false_works,
+                'pindding_works'=>$pindding_works
             ],200);  
         } catch(Exception $err) {
             return response()->json(["message"=>$err->getMessage()],500);
@@ -306,14 +312,14 @@ class AdminController extends Controller
                 if(!$data)
                      return response()->json(["message"=>"this advertisement not found"],404);
                 $data->volunteer_id=$req->volunteer_id;
-                $data->status="wait";
+                $data->status="pin";
                 $data->save();
             } else if($req->type=="work"){
                 $data=Work::find($req->id);
                 if(!$data)
                      return response()->json(["message"=>"this work not found"],404);
                 $data->volunteer_id=$req->volunteer_id;
-                $data->status="wait";
+                $data->status="pin";
                 $data->save();
             }
             return response()->json(["message"=>"operation success"],200);
@@ -373,7 +379,6 @@ class AdminController extends Controller
             }
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
-                $user[0]->admin->images->delete();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user[0]->admin->images()->saveMany($paths);
             }
@@ -453,7 +458,6 @@ class AdminController extends Controller
             }
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
-                $user[0]->admin->images->delete();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user[0]->admin->images()->saveMany($paths);
             }
@@ -635,7 +639,6 @@ class AdminController extends Controller
             }
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
-                $user[0]->planstore->images->delete();
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user[0]->planstore->images()->saveMany($paths);
             }
@@ -700,7 +703,6 @@ class AdminController extends Controller
              $tree[0]->plantsStoreName=$req->plantsStoreName??$tree[0]->plantsStoreName;
              if($req->hasFile('imgs')){
                  (new UploadImageController())->deleteMultiImage($tree[0]->images);
-                 $tree[0]->images->delete();
                  $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                  $tree[0]->images()->saveMany($paths);
              }
@@ -718,7 +720,7 @@ class AdminController extends Controller
                  return response()->json(["message"=>"name not correct"],422);
             $cat=new Category();
             $cat->name=$req->name;
-            $cat->admin_id=auth()->user()->id;
+            $cat->admin_id=auth()->user->admin->id;
             $cat->save();
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){

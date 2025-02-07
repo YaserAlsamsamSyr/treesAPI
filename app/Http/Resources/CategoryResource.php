@@ -17,7 +17,7 @@ class CategoryResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'category'=>$this->category,
+            'category'=>$this->name,
             'article'=>PostResource::collection($this->articles()->paginate(10))
         ];
     }

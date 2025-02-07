@@ -16,7 +16,7 @@ class CategoryOnlyResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'category'=>$this->category
+            'category'=>$this->name
         ];
     }
 }

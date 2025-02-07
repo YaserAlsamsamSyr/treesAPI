@@ -39,6 +39,7 @@ class UploadImageController extends Controller
                     $imgDel=public_path("/images/".$image_path[1]);
                     if(File::exists($imgDel)) {
                         File::delete($imgDel);
+                        $img->delete();
                     }
                 }
     }

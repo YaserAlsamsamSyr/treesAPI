@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('desc');
-            $table->string('status')->default("متوفر");
+            $table->string('status')->default("wait");
             $table->string('plantsStoreName');
-            $table->foreignId("planstore_id")->references('id')->nullable()->on('planstores');
-            $table->foreignId("volunteer_id")->references('id')->nullable()->on('volunteers');
+            $table->foreignId("planstore_id")->nullable()->references('id')->on('planstores');
+            $table->foreignId("volunteer_id")->nullable()->references('id')->on('volunteers');
             $table->timestamps();
         });
     }

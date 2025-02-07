@@ -1,17 +1,18 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PlantsStoreController;
 
 Route::get('/', function () {
     return ['message' => "trees system"];
 });
 
-Route::middleware('allow')->prefix('admin')->group(function(){
+Route::middleware('allow')->group(function(){
     
-    Route::post('/login',[AdminController::class,'adminLogin']);
-    Route::post('/assAdmin/login',[AdminController::class,'adminAssLogin']);
+    Route::post('/admin/login',[AdminController::class,'adminLogin']);
+    Route::post('/admin/assAdmin/login',[AdminController::class,'adminAssLogin']);
 
-    Route::middleware(['auth:sanctum','abilities:admin'])->group(function(){
+    Route::middleware(['auth:sanctum','abilities:admin'])->prefix('admin')->group(function(){
        
         Route::get('/getAllAdminAss',[AdminController::class,'getAllAdminAss'])->middleware('isAdmin');
         Route::get('/getAllVolunteersWaiting',[AdminController::class,'getAllVolunteersWaiting']);
@@ -48,5 +49,9 @@ Route::middleware('allow')->prefix('admin')->group(function(){
         Route::delete('/deleteTree/{id}',[AdminController::class,'deleteTree']);
         Route::delete('/deleteEvent/{id}',[AdminController::class,'deleteEvent']);
 
+    });
+
+    Route::middleware(['auth:sanctum','abilities:plan'])->prefix('plan')->group(function(){
+        // Route::post('/login',[PlantsStoreController::class,'']);
     });
 });

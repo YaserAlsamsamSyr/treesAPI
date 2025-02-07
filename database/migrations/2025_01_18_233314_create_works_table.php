@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('address');
             $table->string('desc');
-            $table->string('status')->default("متوفر");
-            $table->foreignId('volunteer_id')->references('id')->nullable()->on('volunteers');
+            $table->string('status')->default("wait");
+            $table->foreignId('volunteer_id')->nullable()->references('id')->on('volunteers');
             $table->timestamps();
         });
     }
