@@ -31,12 +31,12 @@ class PlantsStoreController extends Controller
             ]);
             if(!auth()->attempt(['userName' => $req->userName, 'password' => $req->password,'role'=>'plan']))
                 return response()->json(['message'=>'password or email not correct'],422);
-            if(auth()->user->planstore->isApproved=="no")
+            if(auth()->user()->planstore->isApproved=="no")
                return response()->json(['message'=>'your request to join was rejected'],422);
-            if(auth()->user->planstore->isApproved=="pin")
+            if(auth()->user()->planstore->isApproved=="pin")
                return response()->json(['message'=>'your request to join is pindding'],422);
             $token=auth()->user()->createToken('plan',expiresAt:now()->addDays(4),abilities:['plan'])->plainTextToken;
-            $planData=new PlantsStoreResource(auth()->user->planstore);
+            $planData=new PlantsStoreResource(auth()->user()->planstore);
             return response()->json(['token'=>$token,$planData],200);
         } catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
@@ -45,10 +45,10 @@ class PlantsStoreController extends Controller
     public function getMyTrees(Request $req){
         try {
             $numItems=$req->per_page??10;
-            $pindding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user->planstore->id)->where('status','pin')->paginate($numItems));
-            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user->planstore->id)->where('status','wait')->paginate($numItems));
-            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user->planstore->id)->where('status','done')->paginate($numItems));
-            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user->planstore->id)->where('status','false')->paginate($numItems));
+            $pindding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','pin')->paginate($numItems));
+            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','wait')->paginate($numItems));
+            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','done')->paginate($numItems));
+            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','false')->paginate($numItems));
             return response()->json([
                 'waiting_trees'=>$waiting_trees,
                 'done_trees'=>$done_trees,
@@ -76,12 +76,12 @@ class PlantsStoreController extends Controller
         try{
             $tree=new Advertisement();
             $tree->name = $req->name;
-            $tree->plantsStoreName=auth()->user->name;
+            $tree->plantsStoreName=auth()->user()->name;
             $tree->desc = $req->desc;
-            $tree->planstore_id=auth()->user->planstore->id;
+            $tree->planstore_id=auth()->user()->planstore->id;
             $tree->save();
-            auth()->user->planstore->rate++;
-            auth()->user->planstore->save();
+            auth()->user()->planstore->rate++;
+            auth()->user()->planstore->save();
             if($req->hasFile('images')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
                 $tree->images()->saveMany($paths);

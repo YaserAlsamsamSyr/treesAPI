@@ -720,7 +720,7 @@ class AdminController extends Controller
                  return response()->json(["message"=>"name not correct"],422);
             $cat=new Category();
             $cat->name=$req->name;
-            $cat->admin_id=auth()->user->admin->id;
+            $cat->admin_id=auth()->user()->admin->id;
             $cat->save();
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){

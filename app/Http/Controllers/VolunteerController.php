@@ -31,12 +31,12 @@ class VolunteerController extends Controller
             ]);
             if(!auth()->attempt(['userName' => $req->userName, 'password' => $req->password,'role'=>'volun']))
                 return response()->json(['message'=>'password or email not correct'],422);
-            if(auth()->user->volunteer->isApproved=="no")
+            if(auth()->user()->volunteer->isApproved=="no")
                return response()->json(['message'=>'your request to join was rejected'],422);
-            if(auth()->user->volunteer->isApproved=="pin")
+            if(auth()->user()->volunteer->isApproved=="pin")
                return response()->json(['message'=>'your request to join is pindding'],422);
             $token=auth()->user()->createToken('volun',expiresAt:now()->addDays(4),abilities:['volun'])->plainTextToken;
-            $volData=new VolunteerResource(auth()->user->volunteer);
+            $volData=new VolunteerResource(auth()->user()->volunteer);
             return response()->json(['token'=>$token,$volData],200);
         } catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
@@ -45,12 +45,12 @@ class VolunteerController extends Controller
     public function getMyWorks(Request $req){
         try {
             $numItems=$req->per_page??10;
-            $trees_Que=AdvertisementsResource::collection(auth()->user->volunteer->advertisements()->where('status','pin')->paginate($numItems));
-            $works_Que=WorkResource::collection(auth()->user->volunteer->works()->where('status','pin')->paginate($numItems));
-            $loadingTrees=AdvertisementsResource::collection(auth()->user->volunteer->advertisements()->where('status','false')->paginate($numItems));
-            $loadingWorks=WorkResource::collection(auth()->user->volunteer->works()->where('status','false')->paginate($numItems));
-            $doneTrees=AdvertisementsResource::collection(auth()->user->volunteer->advertisements()->where('status','done')->paginate($numItems));
-            $doneWorks=WorkResource::collection(auth()->user->volunteer->works()->where('status','done')->paginate($numItems));
+            $trees_Que=AdvertisementsResource::collection(auth()->user()->volunteer->advertisements()->where('status','pin')->paginate($numItems));
+            $works_Que=WorkResource::collection(auth()->user()->volunteer->works()->where('status','pin')->paginate($numItems));
+            $loadingTrees=AdvertisementsResource::collection(auth()->user()->volunteer->advertisements()->where('status','false')->paginate($numItems));
+            $loadingWorks=WorkResource::collection(auth()->user()->volunteer->works()->where('status','false')->paginate($numItems));
+            $doneTrees=AdvertisementsResource::collection(auth()->user()->volunteer->advertisements()->where('status','done')->paginate($numItems));
+            $doneWorks=WorkResource::collection(auth()->user()->volunteer->works()->where('status','done')->paginate($numItems));
             return response()->json([
                 'trees_Que'=>$trees_Que,
                 'works_Que'=>$works_Que,
@@ -73,14 +73,14 @@ class VolunteerController extends Controller
             if(!preg_match($pattern, $req->type))
                 return response()->json(["message"=>"type not correct"],422);
             if($req->type=="tree"){
-                $tree=Advertisement::where('id',$id)->where('volunteer_id',auth()->user->volunteer->id)->get();
+                $tree=Advertisement::where('id',$id)->where('volunteer_id',auth()->user()->volunteer->id)->get();
                 if(sizeof($tree)==0)
                     return response()->json(["message"=>"this tree not found"],404);
                 $tree[0]->isDone='yes';
                 $tree[0]->status='done';
                 $tree[0]->save();
             } else if($req->type=="work"){
-                $work=Work::where('id',$id)->where('volunteer_id',auth()->user->volunteer->id)->get();
+                $work=Work::where('id',$id)->where('volunteer_id',auth()->user()->volunteer->id)->get();
                 if(sizeof($work)==0)
                     return response()->json(["message"=>"this work not found"],404);
                 $work[0]->isDone='yes';
@@ -92,7 +92,6 @@ class VolunteerController extends Controller
         }catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
         }
-
     }
     public function approveWorkOrTree(Request $req,string $id){
         try{
@@ -104,14 +103,14 @@ class VolunteerController extends Controller
             if(!preg_match($pattern, $req->type))
                 return response()->json(["message"=>"type not correct"],422);
             if($req->type=="tree"){
-                $tree=Advertisement::where('id',$id)->where('volunteer_id',auth()->user->volunteer->id)->get();
+                $tree=Advertisement::where('id',$id)->where('volunteer_id',auth()->user()->volunteer->id)->get();
                 if(sizeof($tree)==0)
                     return response()->json(["message"=>"this tree not found"],404);
                 $tree[0]->isDone='pin';
                 $tree[0]->status='false';
                 $tree[0]->save();
             } else if($req->type=="work"){
-                $work=Work::where('id',$id)->where('volunteer_id',auth()->user->volunteer->id)->get();
+                $work=Work::where('id',$id)->where('volunteer_id',auth()->user()->volunteer->id)->get();
                 if(sizeof($work)==0)
                     return response()->json(["message"=>"this work not found"],404);
                 $work[0]->isDone='pin';
@@ -119,13 +118,12 @@ class VolunteerController extends Controller
                 $work[0]->save();
             } else
                 return response()->json(["message"=>"type not found"],422);
-            auth()->user->volunteer->rate++;
-            auth()->user->volunteer->save();
+            auth()->user()->volunteer->rate++;
+            auth()->user()->volunteer->save();
             return response()->json(['message'=>'approved done'],200);
         }catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
         }
-
     }   
     public function rejectWorkOrTree(Request $req,string $id){
         try{
@@ -137,14 +135,14 @@ class VolunteerController extends Controller
             if(!preg_match($pattern, $req->type))
                 return response()->json(["message"=>"type not correct"],422);
             if($req->type=="tree"){
-                $tree=Advertisement::where('id',$id)->where('volunteer_id',auth()->user->volunteer->id)->get();
+                $tree=Advertisement::where('id',$id)->where('volunteer_id',auth()->user()->volunteer->id)->get();
                 if(sizeof($tree)==0)
                     return response()->json(["message"=>"this tree not found"],404);
                 $tree[0]->isDone='';
                 $tree[0]->status='wait';
                 $tree[0]->save();
             } else if($req->type=="work"){
-                $work=Work::where('id',$id)->where('volunteer_id',auth()->user->volunteer->id)->get();
+                $work=Work::where('id',$id)->where('volunteer_id',auth()->user()->volunteer->id)->get();
                 if(sizeof($work)==0)
                     return response()->json(["message"=>"this work not found"],404);
                 $work[0]->isDone='';
@@ -156,7 +154,6 @@ class VolunteerController extends Controller
         }catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
         }
-
     }
     public function assignWorkOrTreeToMe(Request $req,string $id){
         try{
@@ -173,7 +170,7 @@ class VolunteerController extends Controller
                     return response()->json(["message"=>"this tree not found"],404);
                 $tree[0]->isDone='pin';
                 $tree[0]->status='false';
-                $tree[0]->volunteer_id=auth()->user->volunteer->id;
+                $tree[0]->volunteer_id=auth()->user()->volunteer->id;
                 $tree[0]->save();
             } else if($req->type=="work"){
                 $work=Work::where('id',$id)->get();
@@ -181,12 +178,12 @@ class VolunteerController extends Controller
                     return response()->json(["message"=>"this work not found"],404);
                 $work[0]->isDone='pin';
                 $work[0]->status='false';
-                $work[0]->volunteer_id=auth()->user->volunteer->id;
+                $work[0]->volunteer_id=auth()->user()->volunteer->id;
                 $work[0]->save();
             } else
                 return response()->json(["message"=>"type not found"],422);
-            auth()->user->volunteer->rate++;
-            auth()->user->volunteer->save();
+            auth()->user()->volunteer->rate++;
+            auth()->user()->volunteer->save();
             return response()->json(['message'=>'assigne done'],200);
         } catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
@@ -237,7 +234,7 @@ class VolunteerController extends Controller
     public function getAllVolunteers(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=VolunteerResource::collection(Volunteer::where('id','!=',auth()->user->volunteer->id)->where('isApproved','yes')->paginate($numItems));
+            $data=VolunteerResource::collection(Volunteer::where('id','!=',auth()->user()->volunteer->id)->where('isApproved','yes')->paginate($numItems));
             return response()->json(['allVolunteers'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
