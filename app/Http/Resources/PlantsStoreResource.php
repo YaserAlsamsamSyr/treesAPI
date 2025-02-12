@@ -18,6 +18,7 @@ class PlantsStoreResource extends JsonResource
     {
         return [
             'id'=>$this->persone->id,
+            'mac'=>$this->mac,
             'name'=>$this->persone->name,
             'email'=>$this->persone->email,
             'userName'=>$this->persone->userName,

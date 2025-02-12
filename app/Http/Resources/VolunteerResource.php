@@ -15,6 +15,7 @@ class VolunteerResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'mac'=>$this->mac,
             'id'=>$this->user->id,
             'name'=>$this->user->name,
             'email'=>$this->user->email,

@@ -22,7 +22,12 @@ class WorkRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'name' => ['required', 'string', 'max:255'],
+            'desc' => ['required', 'string', 'max:700'],
+            'address' => ['required', 'string', 'max:500'],
+            'mac'=>['required','string','max:30'],
+            'images' => ['nullable','array'],
+            'images.*' => ['nullable','image','mimes:jpeg,jpg,png'],
         ];
     }
 }

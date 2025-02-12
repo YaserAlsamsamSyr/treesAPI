@@ -13,6 +13,8 @@ class Work extends Model
         'address',
         'desc',
         'status',
+        'isDone',
+        'mac',
         'volunteer_id'
     ];
     public function images(){

@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('works', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('mac')->default("no mac");
             $table->string('address');
             $table->string('desc');
             $table->string('status')->default("wait");
+            $table->string('isDone')->nullable();
             $table->foreignId('volunteer_id')->nullable()->references('id')->on('volunteers');
             $table->timestamps();
         });

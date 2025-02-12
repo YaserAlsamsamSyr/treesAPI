@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('desc');
             $table->string('status')->default("wait");
+            $table->string('isDone')->nullable();
             $table->string('plantsStoreName');
             $table->foreignId("planstore_id")->nullable()->references('id')->on('planstores');
             $table->foreignId("volunteer_id")->nullable()->references('id')->on('volunteers');

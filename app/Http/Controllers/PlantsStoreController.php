@@ -31,6 +31,10 @@ class PlantsStoreController extends Controller
             ]);
             if(!auth()->attempt(['userName' => $req->userName, 'password' => $req->password,'role'=>'plan']))
                 return response()->json(['message'=>'password or email not correct'],422);
+            if(auth()->user->planstore->isApproved=="no")
+               return response()->json(['message'=>'your request to join was rejected'],422);
+            if(auth()->user->planstore->isApproved=="pin")
+               return response()->json(['message'=>'your request to join is pindding'],422);
             $token=auth()->user()->createToken('plan',expiresAt:now()->addDays(4),abilities:['plan'])->plainTextToken;
             $planData=new PlantsStoreResource(auth()->user->planstore);
             return response()->json(['token'=>$token,$planData],200);
@@ -55,7 +59,7 @@ class PlantsStoreController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getTree($tree_id){
+    public function getTree(string $tree_id){
         try {
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $tree_id))
@@ -107,7 +111,7 @@ class PlantsStoreController extends Controller
              $pattern = "/^[0-9]+$/";
              if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of tree not correct"],422);
-             $tree=Advertisement::where('status','متوفر')->where('id',$id)->where('planstore_id',auth()->user->planstore->id)->get();
+             $tree=Advertisement::where('status','wait')->where('id',$id)->where('planstore_id',auth()->user->planstore->id)->get();
              if(sizeof($tree)==0)
                  return response()->json(["message"=>"this tree not found or can not update it"],404);
              $tree[0]->name=$req->name??$tree[0]->name;
@@ -131,7 +135,7 @@ class PlantsStoreController extends Controller
                 'volunteer_id'=>['required','regex:/^([0-9]+)$/'],
                 'tree_id'=>['required','regex:/^([0-9]+)$/']
             ]);
-            $data=Advertisement::find($req->id);
+            $data=Advertisement::find($req->tree_id);
             if(!$data)
                  return response()->json(["message"=>"this tree not found"],404);
             $data->volunteer_id=$req->volunteer_id;
@@ -151,7 +155,7 @@ class PlantsStoreController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getPlanstoreTrees(Request $req,$planstore_id){
+    public function getPlanstoreTrees(Request $req,string $planstore_id){
         try {
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $planstore_id))
@@ -174,7 +178,7 @@ class PlantsStoreController extends Controller
     public function getAllVolunteers(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=VolunteerResource::collection(Volunteer::where('isApproved','!=','pin')->paginate($numItems));
+            $data=VolunteerResource::collection(Volunteer::where('isApproved','yes')->paginate($numItems));
             return response()->json(['allVolunteers'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -188,7 +192,7 @@ class PlantsStoreController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getArticlesOfCategory(Request $req,$cat_id){
+    public function getArticlesOfCategory(Request $req,string $cat_id){
         try{
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $cat_id))
@@ -209,5 +213,5 @@ class PlantsStoreController extends Controller
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }
-}
+    }
 }

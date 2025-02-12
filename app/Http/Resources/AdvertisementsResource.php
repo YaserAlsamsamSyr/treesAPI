@@ -20,6 +20,7 @@ class AdvertisementsResource extends JsonResource
             'name'=>$this->name,
             'desc'=>$this->desc,
             'status'=>$this->status,
+            'isDone'=>$this->isDone,
             'images'=>ImageResource::collection($this->images),
             'plantsStoreName'=>$this->planstore->persone->name
         ];

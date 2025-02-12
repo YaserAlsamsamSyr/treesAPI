@@ -21,7 +21,10 @@ class WorkResource extends JsonResource
             'desc'=>$this->desc,
             'address'=>$this->address,
             'images'=>ImageResource::collection($this->images),
-            'status'=>$this->status
+            'status'=>$this->status,
+            'isDone'=>$this->isDone,
+            'mac'=>$this->mac,
+            
         ];
     }
 }
