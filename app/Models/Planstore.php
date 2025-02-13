@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Admin;
 use App\Models\User;
 use App\Models\Image;
 use App\Models\Advertisement;

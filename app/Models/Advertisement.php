@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\planstore;
+use App\Models\Planstore;
 use App\Models\volunteer;
 use App\Models\Image;
 
