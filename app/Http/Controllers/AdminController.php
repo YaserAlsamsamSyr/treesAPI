@@ -769,7 +769,6 @@ class AdminController extends Controller
             if(sizeof($cat)==0)
                 return response()->json(["message"=>"this category not found"],404);
             $art=new Article();
-            $art->name=$req->name;
             $art->title=$req->title;
             $art->desc=$req->desc;
             $art->category_id=$cat[0]->id;

@@ -22,7 +22,6 @@ class ArticleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'desc' => ['required', 'string', 'max:500'],
             'images' => ['nullable','array'],

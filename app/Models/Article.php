@@ -9,7 +9,6 @@ use App\Models\Image;
 class Article extends Model
 {
     protected $fillable=[
-        'name',
         'title',
         'desc',
         'category_id'
