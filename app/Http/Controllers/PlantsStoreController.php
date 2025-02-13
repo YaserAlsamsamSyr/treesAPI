@@ -59,12 +59,12 @@ class PlantsStoreController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getTree(string $tree_id){
+    public function getTree(string $id){
         try {
             $pattern = "/^[0-9]+$/";
-            if(!preg_match($pattern, $tree_id))
+            if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of tree not correct"],422);
-            $tree=new AdvertisementsResource(Advertisement::find($tree_id));
+            $tree=new AdvertisementsResource(Advertisement::find($id));
             if(!$tree)
                return response()->json(['message'=>'this tree not found'],404);
             return response()->json($tree,200);  
@@ -155,16 +155,16 @@ class PlantsStoreController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getPlanstoreTrees(Request $req,string $planstore_id){
+    public function getPlanstoreTrees(Request $req,string $id){
         try {
             $pattern = "/^[0-9]+$/";
-            if(!preg_match($pattern, $planstore_id))
+            if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of planstore not correct"],422);
             $numItems=$req->per_page??10;
-            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','pin')->paginate($numItems));
-            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','wait')->paginate($numItems));
-            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','done')->paginate($numItems));
-            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','false')->paginate($numItems));
+            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','pin')->paginate($numItems));
+            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','wait')->paginate($numItems));
+            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','done')->paginate($numItems));
+            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','false')->paginate($numItems));
             return response()->json([
                 'waiting_trees'=>$waiting_trees,
                 'done_trees'=>$done_trees,
@@ -192,13 +192,13 @@ class PlantsStoreController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getArticlesOfCategory(Request $req,string $cat_id){
+    public function getArticlesOfCategory(Request $req,string $id){
         try{
             $pattern = "/^[0-9]+$/";
-            if(!preg_match($pattern, $cat_id))
+            if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of category not correct"],422);
             $numItems=$req->per_page??10;  
-            $data=PostResource::collection(Article::where('category_id',$cat_id)->paginate($numItems));
+            $data=PostResource::collection(Article::where('category_id',$id)->paginate($numItems));
             return response()->json(['allArticles'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
