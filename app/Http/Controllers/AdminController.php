@@ -271,7 +271,7 @@ class AdminController extends Controller
                  return response()->json(["message"=>"id of volunteer not correct"],422);
             $volunteer=Volunteer::where('isApproved','yes')->where('id',$id)->get();
             if(sizeof($volunteer)==0)
-                return response()->json(['message'=>"this volunterr not found or not approved yet"],404);
+                return response()->json(['message'=>"this volunteer not found or not approved yet"],404);
             $numItems=$req->per_page??10;
             $trees_Que=AdvertisementsResource::collection($volunteer[0]->advertisements()->where('status','pin')->paginate($numItems));
             $works_Que=WorkResource::collection($volunteer[0]->works()->where('status','pin')->paginate($numItems));
