@@ -41,6 +41,7 @@ Route::middleware('allow')->group(function(){
         Route::get('/getTraffic',[AdminController::class,'getTraffic']);
         Route::get('/getEvents',[AdminController::class,'getEvents']);
         Route::get('/getperson/{id}/{type}',[AdminController::class,'getperson']);
+        Route::get('/getvolunteerWorks/{id}',[AdminController::class,'getvolunteerWorks']);
 
         Route::post('/approvePlanOrVolun',[AdminController::class,'approvePlanOrVolun']);
         Route::post('/assignToVolunteer',[AdminController::class,'assignToVolunteer']);

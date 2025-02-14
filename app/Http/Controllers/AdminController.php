@@ -264,6 +264,33 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    public function getvolunteerWorks(Request $req,string $id){
+        try {
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                 return response()->json(["message"=>"id of volunteer not correct"],422);
+            $volunteer=Volunteer::where('isApproved','yes')->where('id',$id)->get();
+            if(sizeof($volunteer)==0)
+                return response()->json(['message'=>"this volunterr not found or not approved yet"],404);
+            $numItems=$req->per_page??10;
+            $trees_Que=AdvertisementsResource::collection($volunteer[0]->advertisements()->where('status','pin')->paginate($numItems));
+            $works_Que=WorkResource::collection($volunteer[0]->works()->where('status','pin')->paginate($numItems));
+            $loadingTrees=AdvertisementsResource::collection($volunteer[0]->advertisements()->where('status','false')->paginate($numItems));
+            $loadingWorks=WorkResource::collection($volunteer[0]->works()->where('status','false')->paginate($numItems));
+            $doneTrees=AdvertisementsResource::collection($volunteer[0]->advertisements()->where('status','done')->paginate($numItems));
+            $doneWorks=WorkResource::collection($volunteer[0]->works()->where('status','done')->paginate($numItems));
+            return response()->json([
+                'trees_Que'=>$trees_Que,
+                'works_Que'=>$works_Que,
+                'loadingTrees'=>$loadingTrees,
+                'loadingWorks'=>$loadingWorks,
+                'doneTrees'=>$doneTrees,
+                'doneWorks'=>$doneWorks
+            ],200);  
+        } catch(Exception $err) {
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
     //approve and assign
     public function approvePlanOrVolun(Request $req){
         try{
