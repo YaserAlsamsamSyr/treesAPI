@@ -17,6 +17,7 @@ class VolunteerResource extends JsonResource
         return [
             'mac'=>$this->mac,
             'id'=>$this->user->id,
+            'volun_id'=>$this->id,
             'name'=>$this->user->name,
             'email'=>$this->user->email,
             'userName'=>$this->user->userName,
