@@ -6,14 +6,17 @@ use Illuminate\Http\Request;
 use App\Http\Resources\WorkResource;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminassResource;
+use App\Http\Resources\AdminResource;
 use App\Http\Resources\VolunteerResource;
 use App\Http\Resources\PlantsStoreResource;
 use App\Http\Resources\AdvertisementsResource;
 use App\Http\Resources\CategoryOnlyResource;
 use App\Http\Resources\PostResource;
+use App\Http\Resources\EventResource;
 use App\Models\Advertisement;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\Volunteer;
 use App\Models\Planstore;
 use App\Models\Work;
@@ -62,6 +65,7 @@ class UserController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    //plan-id
     public function getPlanstoreTrees(Request $req,string $planstore_id){
         try {
             $pattern = "/^[0-9]+$/";
@@ -82,11 +86,73 @@ class UserController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    //
+    public function getperson(string $id,string $type){
+        try{
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id not correct"],422);
+            $pattern = "/^[A-Za-z|\s]+$/";
+            if(!preg_match($pattern, $type))
+                return response()->json(["message"=>"type not correct"],422);
+            $data='';
+            if($type=='admin'){
+                $data=User::where('role','admin')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this admin not found"],404);
+                $data=new AdminResource($data[0]);
+            }
+            else if($type=='adminAss'){
+                $data=User::where('role','adminAss')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this assAdmin not found"],404);
+                $data=new AdminassResource($data[0]);
+            }
+            else if($type=='volun'){
+                $data=User::where('role','volun')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this volunteer not found"],404);
+                $data=new VolunteerResource($data[0]->volunteer);
+            }
+            else if($type=='plan'){
+                $data=User::where('role','plan')->where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this planstore not found"],404);
+                $data=new PlantsStoreResource($data[0]->planstore);
+            }
+            else if($type=='event'){
+                $data=Event::where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this event not found"],404);
+                $data=new EventResource($data[0]);
+            }
+            else if($type=='art'){
+                $data=Article::where('id',$id)->get();
+                if(sizeof($data)==0)
+                       return response()->json(['message'=>"this artricle not found"],404);
+                $data=new PostResource($data[0]);
+            }
+            if(!$data)
+                return response()->json(['message'=>"this type not found"],404);
+            return response()->json($data,200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
     public function getAllVolunteers(Request $req){
         try{
             $numItems=$req->per_page??10;
             $data=VolunteerResource::collection(Volunteer::where('isApproved','yes')->paginate($numItems));
             return response()->json(['allVolunteers'=>$data],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }    
+    public function getAllEvent(Request $req){
+        try{
+            $numItems=$req->per_page??10;
+            $data=EventResource::collection(Event::paginate($numItems));
+            return response()->json(['allEvents'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }

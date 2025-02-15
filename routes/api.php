@@ -117,6 +117,8 @@ Route::middleware('allow')->group(function(){
         Route::get('/getCategories',[UserController::class,'getCategories']);
         Route::get('/getArticlesOfCategory/{id}',[UserController::class,'getArticlesOfCategory']);
         Route::get('/getAllAdminAss',[UserController::class,'getAllAdminAss']);
+        Route::get('/getperson/{id}/{type}',[UserController::class,'getperson']);
+        Route::get('/getAllEvent',[UserController::class,'getAllEvent']);
     
         Route::post('/createWork',[UserController::class,'createWork']);
         Route::post('/planstoreRequest',[UserController::class,'planstoreRequest']);

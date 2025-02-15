@@ -122,6 +122,7 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    //---plan-id,volun-id
     public function getPlanstoreTrees(Request $req,string $id){
         try {
             $pattern = "/^[0-9]+$/";
@@ -142,6 +143,7 @@ class AdminController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    //
     public function getAdvertisementsQue(Request $req){
         try{
             $numItems=$req->per_page??10;
@@ -264,6 +266,7 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    //---plan-id,volun-id
     public function getvolunteerWorks(Request $req,string $id){
         try {
             $pattern = "/^[0-9]+$/";
@@ -291,7 +294,7 @@ class AdminController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    //approve and assign
+    //approve and assign ---plan-id,volun-id
     public function approvePlanOrVolun(Request $req){
         try{
             // { 
@@ -360,7 +363,7 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    //admin
+    //
     public function createAdmin(AdminRequest $req){
          try{
             $imgName="no image";
