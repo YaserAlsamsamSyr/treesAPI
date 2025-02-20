@@ -26,7 +26,7 @@ class UpdateVolunterRequest extends FormRequest
             'name' => ['nullable', 'string', 'max:255'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'logo'=>['nullable','image','mimes:jpeg,png,jpg'],
-            'desc' => ['nullable', 'string', 'max:700'],
+            'desc' => ['nullable', 'string'],
             'address' => ['nullable', 'string', 'max:500'],
             'phone' => ['nullable', 'string', 'regex:/^[0-9]{7,15}$/']
         ];

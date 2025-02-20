@@ -27,7 +27,7 @@ class UpdateAdminRequest extends FormRequest
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'logo'=>['nullable','image','mimes:jpeg,png,jpg'],
             'orgName' => ['nullable', 'string', 'max:255'],
-            'desc' => ['nullable', 'string', 'max:700'],
+            'desc' => ['nullable', 'string'],
             'address' => ['nullable', 'string', 'max:500'],
             'phone' => ['nullable', 'string', 'regex:/^[0-9]{7,15}$/'],
             'imgs' => ['nullable','array'],

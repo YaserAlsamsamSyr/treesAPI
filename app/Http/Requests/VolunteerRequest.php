@@ -29,7 +29,7 @@ class VolunteerRequest extends FormRequest
             'userName' => ['required', 'string', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'logo'=>['nullable','image','mimes:jpeg,png,jpg'],
-            'desc' => ['required', 'string', 'max:700'],
+            'desc' => ['required', 'string'],
             'address' => ['required', 'string', 'max:500'],
             'phone' => ['required', 'string', 'regex:/^[0-9]{7,15}$/']
         ];

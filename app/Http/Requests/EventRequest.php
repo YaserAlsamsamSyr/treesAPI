@@ -24,7 +24,7 @@ class EventRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:400'],
-            'desc' => ['required', 'string', 'max:500'],
+            'desc' => ['required', 'string'],
             'orgName' => ['required', 'string', 'max:255'],
             'orgOwnerName' => ['required', 'string', 'max:255'],
             'startDate' => ['required', 'string', 'max:255'],

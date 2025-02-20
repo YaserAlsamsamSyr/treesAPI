@@ -29,7 +29,7 @@ class AdminRequest extends FormRequest
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'logo'=>['nullable','image','mimes:jpeg,png,jpg'],
             'orgName' => ['required', 'string', 'max:255'],
-            'desc' => ['required', 'string', 'max:700'],
+            'desc' => ['required', 'string'],
             'address' => ['required', 'string', 'max:500'],
             'phone' => ['required', 'string', 'regex:/^[0-9]{7,15}$/'],
             'imgs' => ['nullable','array'],

@@ -23,7 +23,7 @@ class WorkRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'desc' => ['required', 'string', 'max:700'],
+            'desc' => ['required', 'string'],
             'address' => ['required', 'string', 'max:500'],
             'mac'=>['required','string','max:30'],
             'images' => ['nullable','array'],

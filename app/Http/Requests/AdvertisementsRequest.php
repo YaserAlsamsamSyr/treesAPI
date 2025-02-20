@@ -23,7 +23,7 @@ class AdvertisementsRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'desc' => ['required', 'string', 'max:500'],
+            'desc' => ['required', 'string'],
             'images' => ['nullable','array'],
             'images.*' => ['nullable','image','mimes:jpeg,jpg,png'],
         ];

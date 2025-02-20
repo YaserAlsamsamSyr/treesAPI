@@ -31,6 +31,7 @@ use App\Http\Controllers\UploadImageController;
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\AdvertisementsRequest;
+use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\EventRequest;
 use App\Http\Requests\VolunteerRequest;
 use App\Http\Requests\PlantsStoreRequest;
@@ -777,14 +778,11 @@ class AdminController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }  
     }
-    public function updateCategory(Request $req,string $id){
+    public function updateCategory(CategoryRequest $req,string $id){
         try{
            $pattern = "/^[0-9]+$/";
            if(!preg_match($pattern, $id))
                 return response()->json(["message"=>"id of category not correct"],422);
-           $pattern = "/^[A-Za-z|\s]+$/";
-           if(!preg_match($pattern, $req->name))
-                return response()->json(["message"=>"name not correct"],422);
            $cat=Category::where('id',$id)->get();
            if(sizeof($cat)==0)
                return response()->json(["message"=>"this category not found"],404);
