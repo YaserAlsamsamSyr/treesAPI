@@ -37,7 +37,7 @@ class PlantsStoreController extends Controller
                return response()->json(['message'=>'your request to join is pindding'],422);
             $token=auth()->user()->createToken('plan',expiresAt:now()->addDays(4),abilities:['plan'])->plainTextToken;
             $planData=new PlantsStoreResource(auth()->user()->planstore);
-            return response()->json(['token'=>$token,$planData],200);
+            return response()->json(['token'=>$token,"profile"=>$planData],200);
         } catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
         }

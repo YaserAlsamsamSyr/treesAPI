@@ -37,7 +37,7 @@ class VolunteerController extends Controller
                return response()->json(['message'=>'your request to join is pindding'],422);
             $token=auth()->user()->createToken('volun',expiresAt:now()->addDays(4),abilities:['volun'])->plainTextToken;
             $volData=new VolunteerResource(auth()->user()->volunteer);
-            return response()->json(['token'=>$token,$volData],200);
+            return response()->json(['token'=>$token,"profile"=>$volData],200);
         } catch(Exception $err){
             return response()->json(["message"=>$err->getMessage()],500);
         }
