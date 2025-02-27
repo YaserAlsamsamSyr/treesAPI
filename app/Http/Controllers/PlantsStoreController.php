@@ -96,7 +96,7 @@ class PlantsStoreController extends Controller
            $pattern = "/^[0-9]+$/";
            if(!preg_match($pattern, $id))
                 return response()->json(["message"=>"id of tree not correct"],422);
-           $tree=Advertisement::where('status','wait')->where('id',$id)->where('planstore_id',auth()->user->planstore->id)->get();
+           $tree=Advertisement::where('status','wait')->where('id',$id)->where('planstore_id',auth()->user()->planstore->id)->get();
            if(sizeof($tree)==0)
                return response()->json(["message"=>"this tree not found or can not delete it"],403);
            (new UploadImageController())->deleteMultiImage($tree[0]->images);
