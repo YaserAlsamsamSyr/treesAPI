@@ -21,6 +21,7 @@ class AllowMiddleware
             ->header('Access-Control-Allow-Credentials', true)
             // ->header('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,X-Token-Auth,Authorization')
             ->header('Access-Control-Allow-Headers', '*')
-            ->header('Accept', 'application/json,multipart/form-data');
+            // ->header('Accept', 'application/json,multipart/form-data');
+            ->header('Accept', '*');
     }
 }
