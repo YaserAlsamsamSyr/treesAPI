@@ -28,6 +28,7 @@ use App\Models\Year;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\UploadImageController;
+use App\Http\Requests\MacRequest;
 use App\Http\Requests\VolunteerRequest;
 use App\Http\Requests\PlantsStoreRequest;
 use App\Http\Requests\WorkRequest;
@@ -318,11 +319,8 @@ class UserController extends Controller
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function addUserToTraffic(Request $req){
+    public function addUserToTraffic(MacRequest $req){
         try{
-            $pattern ="/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/";
-            if(!preg_match($pattern, $req->mac))
-                 return response()->json(["message"=>"mac not correct"],422);
             $newTraffic=new Traffic();
             $newTraffic->mac=$req->mac;
             $day=date('d');
