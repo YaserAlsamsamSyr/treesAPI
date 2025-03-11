@@ -119,6 +119,8 @@ Route::middleware('allow')->group(function(){
         Route::get('/getAllAdminAss',[UserController::class,'getAllAdminAss']);
         Route::get('/getperson/{id}/{type}',[UserController::class,'getperson']);
         Route::get('/getAllEvent',[UserController::class,'getAllEvent']);
+        Route::get('/whatsNew',[UserController::class,'whatsNew']);
+        Route::get('/totalAmount',[UserController::class,'totalAmount']);
     
         Route::post('/createWork',[UserController::class,'createWork']);
         Route::post('/planstoreRequest',[UserController::class,'planstoreRequest']);

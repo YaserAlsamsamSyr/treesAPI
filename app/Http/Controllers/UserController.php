@@ -355,4 +355,37 @@ class UserController extends Controller
             return response()->json(['message'=>$err->getMessage(),422]);
         }
     } 
+    // new
+    public function whatsNew(){
+        try{
+            $doneWork = Work::where('status','done')->orderBy('id', 'desc')->paginate(15);
+            $notDoneWork = Work::where('status','wait')->orderBy('id', 'desc')->paginate(15);
+            $doneTree = Advertisement::where('status','done')->orderBy('id', 'desc')->paginate(15);
+            $notDoneTree = Advertisement::where('status','wait')->orderBy('id', 'desc')->paginate(15);
+            return response()->json([
+                'doneWork'=>$doneWork,
+                'notDoneWork'=>$notDoneWork,
+                'doneTree'=>$doneTree,
+                'notDoneTree'=>$notDoneTree
+            ],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
+    public function totalAmount(){
+        try{
+            $doneWork = Work::where('status','done')->count();
+            $volunteers = Volunteer::count();
+            $doneTree = Advertisement::where('status','done')->count();
+            $planstores = Planstore::count();
+            return response()->json([
+                'doneWork'=>$doneWork,
+                'volunteers'=>$volunteers,
+                'doneTree'=>$doneTree,
+                'planstores'=>$planstores
+            ],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }
+    }
 }
