@@ -358,10 +358,10 @@ class UserController extends Controller
     // new
     public function whatsNew(){
         try{
-            $doneWork = Work::where('status','done')->orderBy('id', 'desc')->paginate(15);
-            $notDoneWork = Work::where('status','wait')->orderBy('id', 'desc')->paginate(15);
-            $doneTree = Advertisement::where('status','done')->orderBy('id', 'desc')->paginate(15);
-            $notDoneTree = Advertisement::where('status','wait')->orderBy('id', 'desc')->paginate(15);
+            $doneWork = WorkResource::collection(Work::where('status','done')->orderBy('id', 'desc')->paginate(15));
+            $notDoneWork = WorkResource::collection(Work::where('status','wait')->orderBy('id', 'desc')->paginate(15));
+            $doneTree = AdvertisementsResource::collection(Advertisement::where('status','done')->orderBy('id', 'desc')->paginate(15));
+            $notDoneTree = AdvertisementsResource::collection(Advertisement::where('status','wait')->orderBy('id', 'desc')->paginate(15));
             return response()->json([
                 'doneWork'=>$doneWork,
                 'notDoneWork'=>$notDoneWork,
