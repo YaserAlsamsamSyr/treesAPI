@@ -284,12 +284,9 @@ class UserController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function getMyWorks(Request $req){
+    public function getMyWorks(MacRequest $req){
         try {
             $mac=$req->mac;
-            $pattern ="/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/";
-            if(!preg_match($pattern, $mac))
-                 return response()->json(["message"=>"mac not correct"],422);
             $numItems=$req->per_page??10;
             $waiting_works=WorkResource::collection(Work::where('mac',$mac)->where('status','wait')->paginate($numItems));
             $pindding_works=WorkResource::collection(Work::where('mac',$mac)->where('status','pin')->paginate($numItems));
@@ -305,12 +302,9 @@ class UserController extends Controller
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
-    public function myRequests(Request $req){
+    public function myRequests(MacRequest $req){
         try{
             $mac=$req->mac;
-            $pattern ="/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/";
-            if(!preg_match($pattern, $mac))
-                 return response()->json(["message"=>"mac not correct"],422);
             $numItems=$req->per_page??10;
             $plants=PlantsStoreResource::collection(Planstore::where('mac',$mac)->paginate($numItems));
             $volunteers=VolunteerResource::collection(Volunteer::where('mac',$mac)->paginate($numItems));
