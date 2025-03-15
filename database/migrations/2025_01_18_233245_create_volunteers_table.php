@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('volunteers', function (Blueprint $table) {
             $table->id();
             $table->string('mac');
-            $table->string('desc');
+            $table->mediumText('desc');
             $table->string('address');
             $table->string('phone');
             $table->string('isApproved')->default("pin");

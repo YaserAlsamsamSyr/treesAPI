@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('advertisements', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('desc');
+            $table->mediumText('desc');
             $table->string('status')->default("wait");
             $table->string('isDone')->nullable();
             $table->string('plantsStoreName');

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('phone');
             $table->string('ownerName');
-            $table->string('desc');
+            $table->mediumText('desc');
             $table->string('openTime');
             $table->string('closeTime');
             $table->string('isApproved')->default("pin");

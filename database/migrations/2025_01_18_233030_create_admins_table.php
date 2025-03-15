@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
             $table->string('orgName');
-            $table->string('desc');
+            $table->mediumText('desc');
             $table->string('address');
             $table->string('phone');
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');

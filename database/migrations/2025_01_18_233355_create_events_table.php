@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('address');
-            $table->string('desc');
+            $table->mediumText('desc');
             $table->string('startDate');
             $table->string('endDate');
             $table->string('orgName');

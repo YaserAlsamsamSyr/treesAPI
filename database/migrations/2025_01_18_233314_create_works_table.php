@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('mac')->default("no mac");
             $table->string('address');
-            $table->string('desc');
+            $table->mediumText('desc');
             $table->string('status')->default("wait");
             $table->string('isDone')->nullable();
             $table->foreignId('volunteer_id')->nullable()->references('id')->on('volunteers');
