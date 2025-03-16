@@ -834,7 +834,7 @@ class AdminController extends Controller
     //traffic
     public function getTraffic(){
         try{
-            return response()->json(['traffic'=>TrafficResource::collection(Year::all())],200);
+            return response()->json(['traffic'=>TrafficResource::collection(Year::get())],200);
         } catch(Exception $err){
             return response()->json(['message'=>$err->getMessage(),422]);
         }
