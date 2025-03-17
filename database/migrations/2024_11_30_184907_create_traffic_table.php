@@ -14,10 +14,7 @@ return new class extends Migration
         Schema::create('traffic', function (Blueprint $table) {
             $table->id();
             $table->string('mac');
-            $table->string('isFirst');
-            $table->string('year');
-            $table->string('month');
-            $table->string('day');
+            $table->string('firstTime');
             $table->timestamps();
         });
     }
