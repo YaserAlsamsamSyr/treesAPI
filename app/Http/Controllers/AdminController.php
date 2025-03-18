@@ -750,11 +750,8 @@ class AdminController extends Controller
          }
     }
     //category
-    public function createcategory(Request $req){
+    public function createcategory(CategoryRequest $req){
         try{
-            $pattern = "/^[A-Za-z|\s]+$/";
-            if(!preg_match($pattern, $req->name))
-                 return response()->json(["message"=>"name not correct"],422);
             $cat=new Category();
             $cat->name=$req->name;
             $cat->admin_id=auth()->user()->admin->id;
