@@ -45,10 +45,10 @@ class PlantsStoreController extends Controller
     public function getMyTrees(Request $req){
         try {
             $numItems=$req->per_page??10;
-            $pindding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','pin')->paginate($numItems));
-            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','wait')->paginate($numItems));
-            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','done')->paginate($numItems));
-            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','false')->paginate($numItems));
+            $pindding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','pin')->latest()->paginate($numItems));
+            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','wait')->latest()->paginate($numItems));
+            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','done')->latest()->paginate($numItems));
+            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',auth()->user()->planstore->id)->where('status','false')->latest()->paginate($numItems));
             return response()->json([
                 'waiting_trees'=>$waiting_trees,
                 'done_trees'=>$done_trees,
@@ -151,7 +151,7 @@ class PlantsStoreController extends Controller
     public function getAllPlantsStores(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=PlantsStoreResource::collection(Planstore::where('isApproved','yes')->where('id','!=',auth()->user->planstore->id)->paginate($numItems));
+            $data=PlantsStoreResource::collection(Planstore::where('isApproved','yes')->where('id','!=',auth()->user->planstore->id)->latest()->paginate($numItems));
             return response()->json(["allPlantsStore"=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -164,10 +164,10 @@ class PlantsStoreController extends Controller
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of planstore not correct"],422);
             $numItems=$req->per_page??10;
-            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','pin')->paginate($numItems));
-            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','wait')->paginate($numItems));
-            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','done')->paginate($numItems));
-            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','false')->paginate($numItems));
+            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','pin')->latest()->paginate($numItems));
+            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','wait')->latest()->paginate($numItems));
+            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','done')->latest()->paginate($numItems));
+            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','false')->latest()->paginate($numItems));
             return response()->json([
                 'waiting_trees'=>$waiting_trees,
                 'done_trees'=>$done_trees,
@@ -182,7 +182,7 @@ class PlantsStoreController extends Controller
     public function getAllVolunteers(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=VolunteerResource::collection(Volunteer::where('isApproved','yes')->paginate($numItems));
+            $data=VolunteerResource::collection(Volunteer::where('isApproved','yes')->latest()->paginate($numItems));
             return response()->json(['allVolunteers'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -202,7 +202,7 @@ class PlantsStoreController extends Controller
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of category not correct"],422);
             $numItems=$req->per_page??10;  
-            $data=PostResource::collection(Article::where('category_id',$id)->paginate($numItems));
+            $data=PostResource::collection(Article::where('category_id',$id)->latest()->paginate($numItems));
             return response()->json(['allArticles'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -211,8 +211,8 @@ class PlantsStoreController extends Controller
     public function getAllAdminAss(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $allassAdmin=AdminassResource::collection(User::where('role','adminAss')->paginate($numItems));
-            $allAdmin=AdminassResource::collection(User::where('role','admin')->paginate($numItems));
+            $allassAdmin=AdminassResource::collection(User::where('role','adminAss')->latest()->paginate($numItems));
+            $allAdmin=AdminassResource::collection(User::where('role','admin')->latest()->paginate($numItems));
             return response()->json(['allAdminAss'=>$allassAdmin,'allAdmin'=>$allAdmin],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);

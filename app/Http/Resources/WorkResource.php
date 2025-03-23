@@ -24,6 +24,7 @@ class WorkResource extends JsonResource
             'status'=>$this->status,
             'isDone'=>$this->isDone,
             'mac'=>$this->mac,
+            'volunterrName'=>$this->volunteer->user->name ?? ''
             
         ];
     }

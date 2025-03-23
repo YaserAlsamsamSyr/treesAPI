@@ -38,7 +38,7 @@ class UserController extends Controller
     public function treeQue(Request $req){
         try {
             $numItems=$req->per_page??10;
-            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('status','wait')->paginate($numItems));
+            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('status','wait')->latest()->paginate($numItems));
             return response()->json([
                 'waiting_trees'=>$waiting_trees
             ],200);  
@@ -49,7 +49,7 @@ class UserController extends Controller
     public function workQue(Request $req){
         try {
             $numItems=$req->per_page??10;
-            $waiting_work=WorkResource::collection(Work::where('status','wait')->paginate($numItems));
+            $waiting_work=WorkResource::collection(Work::where('status','wait')->latest()->paginate($numItems));
             return response()->json([
                 'waiting_work'=>$waiting_work
             ],200);  
@@ -60,7 +60,7 @@ class UserController extends Controller
     public function getAllPlantsStores(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=PlantsStoreResource::collection(Planstore::where('isApproved','yes')->paginate($numItems));
+            $data=PlantsStoreResource::collection(Planstore::where('isApproved','yes')->latest()->paginate($numItems));
             return response()->json(["allPlantsStore"=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -73,10 +73,10 @@ class UserController extends Controller
             if(!preg_match($pattern, $planstore_id))
                  return response()->json(["message"=>"id of planstore not correct"],422);
             $numItems=$req->per_page??10;
-            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','pin')->paginate($numItems));
-            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','wait')->paginate($numItems));
-            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','done')->paginate($numItems));
-            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','false')->paginate($numItems));
+            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','pin')->latest()->paginate($numItems));
+            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','wait')->latest()->paginate($numItems));
+            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','done')->latest()->paginate($numItems));
+            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$planstore_id)->where('status','false')->latest()->paginate($numItems));
             return response()->json([
                 'waiting_trees'=>$waiting_trees,
                 'done_trees'=>$done_trees,
@@ -143,7 +143,7 @@ class UserController extends Controller
     public function getAllVolunteers(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=VolunteerResource::collection(Volunteer::where('isApproved','yes')->paginate($numItems));
+            $data=VolunteerResource::collection(Volunteer::where('isApproved','yes')->latest()->paginate($numItems));
             return response()->json(['allVolunteers'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -152,7 +152,7 @@ class UserController extends Controller
     public function getAllEvent(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=EventResource::collection(Event::paginate($numItems));
+            $data=EventResource::collection(Event::latest()->paginate($numItems));
             return response()->json(['allEvents'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -172,7 +172,7 @@ class UserController extends Controller
             if(!preg_match($pattern, $cat_id))
                  return response()->json(["message"=>"id of category not correct"],422);
             $numItems=$req->per_page??10;  
-            $data=PostResource::collection(Article::where('category_id',$cat_id)->paginate($numItems));
+            $data=PostResource::collection(Article::where('category_id',$cat_id)->latest()->paginate($numItems));
             return response()->json(['allArticles'=>$data],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -181,8 +181,8 @@ class UserController extends Controller
     public function getAllAdminAss(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $allassAdmin=AdminassResource::collection(User::where('role','adminAss')->paginate($numItems));
-            $allAdmin=AdminassResource::collection(User::where('role','admin')->paginate($numItems));
+            $allassAdmin=AdminassResource::collection(User::where('role','adminAss')->latest()->paginate($numItems));
+            $allAdmin=AdminassResource::collection(User::where('role','admin')->latest()->paginate($numItems));
             return response()->json(['allAdminAss'=>$allassAdmin,'allAdmin'=>$allAdmin],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
@@ -288,10 +288,10 @@ class UserController extends Controller
         try {
             $mac=$req->mac;
             $numItems=$req->per_page??10;
-            $waiting_works=WorkResource::collection(Work::where('mac',$mac)->where('status','wait')->paginate($numItems));
-            $pindding_works=WorkResource::collection(Work::where('mac',$mac)->where('status','pin')->paginate($numItems));
-            $done_works=WorkResource::collection(Work::where('mac',$mac)->where('status','done')->paginate($numItems));
-            $false_works=WorkResource::collection(Work::where('mac',$mac)->where('status','false')->paginate($numItems));
+            $waiting_works=WorkResource::collection(Work::where('mac',$mac)->where('status','wait')->latest()->paginate($numItems));
+            $pindding_works=WorkResource::collection(Work::where('mac',$mac)->where('status','pin')->latest()->paginate($numItems));
+            $done_works=WorkResource::collection(Work::where('mac',$mac)->where('status','done')->latest()->paginate($numItems));
+            $false_works=WorkResource::collection(Work::where('mac',$mac)->where('status','false')->latest()->paginate($numItems));
             return response()->json([
                 'waiting_works'=>$waiting_works,
                 'done_works'=>$done_works,
@@ -306,8 +306,8 @@ class UserController extends Controller
         try{
             $mac=$req->mac;
             $numItems=$req->per_page??10;
-            $plants=PlantsStoreResource::collection(Planstore::where('mac',$mac)->paginate($numItems));
-            $volunteers=VolunteerResource::collection(Volunteer::where('mac',$mac)->paginate($numItems));
+            $plants=PlantsStoreResource::collection(Planstore::where('mac',$mac)->latest()->paginate($numItems));
+            $volunteers=VolunteerResource::collection(Volunteer::where('mac',$mac)->latest()->paginate($numItems));
             return response()->json(['plantsStore'=>$plants,'volunteers'=>$volunteers],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
