@@ -15,9 +15,9 @@ class WorkResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // $volun='';
-        // if($this->volunteer)
-        //     $volun=$this->volunteer->user->name;
+        $volun='';
+        if($this->volunteer_id)
+            $volun=$this->volunteer->user->name;
         return [
             'id'=>$this->id,
             'name'=>$this->name,
@@ -27,7 +27,7 @@ class WorkResource extends JsonResource
             'status'=>$this->status,
             'isDone'=>$this->isDone,
             'mac'=>$this->mac,
-            'volunterrName'=>''
+            'volunterrName'=>$volun
             
         ];
     }
