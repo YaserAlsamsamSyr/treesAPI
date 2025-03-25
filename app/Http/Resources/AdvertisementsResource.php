@@ -15,9 +15,9 @@ class AdvertisementsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $volun='';
-        if($this->volunteer)
-            $volun=$this->volunteer->user->name;
+        // $volun='';
+        // if($this->volunteer)
+        //     $volun=$this->volunteer->user->name;
         return [
             'id'=>$this->id,
             'name'=>$this->name,
@@ -26,7 +26,7 @@ class AdvertisementsResource extends JsonResource
             'isDone'=>$this->isDone,
             'images'=>ImageResource::collection($this->images),
             'plantsStoreName'=>$this->planstore->persone->name,
-            'volunterrName'=>$volun
+            'volunterrName'=>''
         ];
     }
 }
