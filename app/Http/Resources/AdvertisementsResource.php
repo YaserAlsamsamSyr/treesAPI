@@ -16,7 +16,7 @@ class AdvertisementsResource extends JsonResource
     public function toArray(Request $request): array
     {
         $volun='';
-        if($this->volunteer_id)
+        return $this->volunteer_id;
             $volun=$this->volunteer->user->name;
         return [
             'id'=>$this->id,
