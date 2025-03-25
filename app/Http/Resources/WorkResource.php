@@ -28,7 +28,6 @@ class WorkResource extends JsonResource
             'isDone'=>$this->isDone,
             'mac'=>$this->mac,
             'volunterrName'=>$volun
-            
         ];
     }
 }

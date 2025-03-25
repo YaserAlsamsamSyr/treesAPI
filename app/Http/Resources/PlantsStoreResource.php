@@ -36,10 +36,10 @@ class PlantsStoreResource extends JsonResource
             'adminApproved'=>$this->adminApproved,
             'rate'=>$this->rate,
             'images'=>ImageResource::collection($this->images),
-            'pinding_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','pin')->paginate(10)),
+            'pinding_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','pin')->with('volunteer')->paginate(10)),
             'waiting_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','wait')->paginate(10)),
-            'done_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','done')->paginate(10)),
-            'false_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','false')->paginate(10))
+            'done_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','done')->with('volunteer')->paginate(10)),
+            'false_trees'=>AdvertisementsResource::collection($this->advertisements()->where('status','false')->with('volunteer')->paginate(10))
         ];
     }
 }
