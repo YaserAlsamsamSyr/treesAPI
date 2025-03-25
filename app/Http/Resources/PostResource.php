@@ -20,6 +20,7 @@ class PostResource extends JsonResource
             'title'=>$this->title,
             'desc'=>$this->desc,
             'createdAt'=>$this->created_at,
+            'category'=>$this->category->name,
             'images'=>ImageResource::collection($this->images)
         ];
     }
