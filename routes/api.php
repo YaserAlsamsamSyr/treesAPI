@@ -67,6 +67,7 @@ Route::middleware('allow')->group(function(){
         Route::delete('/deleteEvent/{id}',[AdminController::class,'deleteEvent']);
         Route::delete('/deleteArticles/{id}',[AdminController::class,'deleteArticles']);
         Route::delete('/deleteCategory/{id}',[AdminController::class,'deleteCategory']);
+        Route::delete('/deleteWork/{id}',[AdminController::class,'deleteWork']);
          
     });
     // plan
@@ -121,7 +122,8 @@ Route::middleware('allow')->group(function(){
         Route::get('/getAllEvent',[UserController::class,'getAllEvent']);
         Route::get('/whatsNew',[UserController::class,'whatsNew']);
         Route::get('/totalAmount',[UserController::class,'totalAmount']);
-    
+        Route::get('/getVolunList',[UserController::class,'getVolunList']);
+
         Route::post('/createWork',[UserController::class,'createWork']);
         Route::post('/planstoreRequest',[UserController::class,'planstoreRequest']);
         Route::post('/volunteerRequest',[UserController::class,'volunteerRequest']);

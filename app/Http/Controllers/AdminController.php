@@ -790,6 +790,21 @@ class AdminController extends Controller
            return response()->json(["message"=>$err->getMessage()],500);
         }
     }
+    //work
+    public function deleteWork(string $id){
+        try{
+           $pattern = "/^[0-9]+$/";
+           if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id of work not correct"],422);
+           $work=Work::where('id',$id)->get();
+           if(sizeof($work)==0)
+               return response()->json(["message"=>"this work not found"],404);
+            $work[0]->delete();
+           return response()->json(["message"=>"delete success"],200);
+        } catch(Exception $err){
+              return response()->json(["message"=>$err->getMessage()],500);
+        }  
+    }
     //articles
     public function createArticles(ArticleRequest $req,string $id){
         try{

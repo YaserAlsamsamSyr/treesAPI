@@ -45,19 +45,41 @@ class VolunteerController extends Controller
     public function getMyWorks(Request $req){
         try {
             $numItems=$req->per_page??10;
-            $trees_Que=AdvertisementsResource::collection(auth()->user()->volunteer->advertisements()->where('status','pin')->latest()->paginate($numItems));
-            $works_Que=WorkResource::collection(auth()->user()->volunteer->works()->where('status','pin')->latest()->paginate($numItems));
-            $loadingTrees=AdvertisementsResource::collection(auth()->user()->volunteer->advertisements()->where('status','false')->latest()->paginate($numItems));
-            $loadingWorks=WorkResource::collection(auth()->user()->volunteer->works()->where('status','false')->latest()->paginate($numItems));
-            $doneTrees=AdvertisementsResource::collection(auth()->user()->volunteer->advertisements()->where('status','done')->latest()->paginate($numItems));
-            $doneWorks=WorkResource::collection(auth()->user()->volunteer->works()->where('status','done')->latest()->paginate($numItems));
+            
+            $qtree=auth()->user()->volunteer->advertisements()->where('status','pin')->latest()->paginate($numItems);
+            $ltree=auth()->user()->volunteer->advertisements()->where('status','false')->latest()->paginate($numItems);
+            $dtree=auth()->user()->volunteer->advertisements()->where('status','done')->latest()->paginate($numItems);
+            $qwork=auth()->user()->volunteer->works()->where('status','pin')->latest()->paginate($numItems);
+            $lwork=auth()->user()->volunteer->works()->where('status','false')->latest()->paginate($numItems);
+            $dwork=auth()->user()->volunteer->works()->where('status','done')->latest()->paginate($numItems);
+            
+            $trees_Que=AdvertisementsResource::collection($qtree);
+            $works_Que=WorkResource::collection($qwork);
+            $loadingTrees=AdvertisementsResource::collection($ltree);
+            $loadingWorks=WorkResource::collection($lwork);
+            $doneTrees=AdvertisementsResource::collection($dtree);
+            $doneWorks=WorkResource::collection($dwork);
+
+            $lastPage_qtree=$qtree->lastPage();
+            $lastPage_ltree=$ltree->lastPage();
+            $lastPage_dtree=$dtree->lastPage();
+            $lastPage_qwork=$qwork->lastPage();
+            $lastPage_lwork=$lwork->lastPage();
+            $lastPage_dwork=$dwork->lastPage();
+
             return response()->json([
                 'trees_Que'=>$trees_Que,
                 'works_Que'=>$works_Que,
                 'loadingTrees'=>$loadingTrees,
                 'loadingWorks'=>$loadingWorks,
                 'doneTrees'=>$doneTrees,
-                'doneWorks'=>$doneWorks
+                'doneWorks'=>$doneWorks,
+                'lastPage_qtree'=>$lastPage_qtree,
+                'lastPage_ltree'=>$lastPage_ltree,
+                'lastPage_dtree'=>$lastPage_dtree,
+                'lastPage_qwork'=>$lastPage_qwork,
+                'lastPage_lwork'=>$lastPage_lwork,
+                'lastPage_dwork'=>$lastPage_dwork
             ],200);  
         } catch(Exception $err) {
             return response()->json(["message"=>$err->getMessage()],500);
@@ -192,11 +214,21 @@ class VolunteerController extends Controller
     public function allTreesAndWorksQue(Request $req){
         try {
             $numItems=$req->per_page??10;
-            $trees_Que=AdvertisementsResource::collection(Advertisement::where('status','wait')->latest()->paginate($numItems));
-            $works_Que=WorkResource::collection(Work::where('status','wait')->latest()->paginate($numItems));
+
+            $trees=Advertisement::where('status','wait')->latest()->paginate($numItems);
+            $works=Work::where('status','wait')->latest()->paginate($numItems);
+
+            $trees_Que=AdvertisementsResource::collection($trees);
+            $works_Que=WorkResource::collection($works);
+
+            $lastpage_trees=$trees->lastPage();
+            $lastpage_works=$works->lastPage();
+
             return response()->json([
                 'trees_Que'=>$trees_Que,
-                'works_Que'=>$works_Que
+                'works_Que'=>$works_Que,
+                'lastpage_trees'=>$lastpage_trees,
+                'lastpage_works'=>$lastpage_works
             ],200);  
         } catch(Exception $err) {
             return response()->json(["message"=>$err->getMessage()],500);
@@ -205,8 +237,12 @@ class VolunteerController extends Controller
     public function getAllPlantsStores(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=PlantsStoreResource::collection(Planstore::where('isApproved','yes')->latest()->paginate($numItems));
-            return response()->json(["allPlantsStore"=>$data],200);
+            $data=Planstore::where('isApproved','yes')->latest()->paginate($numItems);
+
+            $plans=PlantsStoreResource::collection($data);
+            
+            $lastpage_plans=$data->lastPage();
+            return response()->json(["allPlantsStore"=>$plans,'lastpage_plans'=>$lastpage_plans],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }
@@ -218,15 +254,31 @@ class VolunteerController extends Controller
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of planstore not correct"],422);
             $numItems=$req->per_page??10;
-            $pinding_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','pin')->latest()->paginate($numItems));
-            $waiting_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','wait')->latest()->paginate($numItems));
-            $done_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','done')->latest()->paginate($numItems));
-            $false_trees=AdvertisementsResource::collection(Advertisement::where('planstore_id',$id)->where('status','false')->latest()->paginate($numItems));
+
+            $ptrees=Advertisement::where('planstore_id',$id)->where('status','pin')->latest()->paginate($numItems);
+            $wtrees=Advertisement::where('planstore_id',$id)->where('status','wait')->latest()->paginate($numItems);
+            $dtrees=Advertisement::where('planstore_id',$id)->where('status','done')->latest()->paginate($numItems);
+            $ftrees=Advertisement::where('planstore_id',$id)->where('status','false')->latest()->paginate($numItems);
+
+            $pinding_trees=AdvertisementsResource::collection($ptrees);
+            $waiting_trees=AdvertisementsResource::collection($wtrees);
+            $done_trees=AdvertisementsResource::collection($dtrees);
+            $false_trees=AdvertisementsResource::collection($ftrees);
+
+            $lastpage_ptrees=$ptrees->lastPage();
+            $lastpage_wtrees=$wtrees->lastPage();
+            $lastpage_dtrees=$dtrees->lastPage();
+            $lastpage_ftrees=$ftrees->lastPage();
+
             return response()->json([
                 'waiting_trees'=>$waiting_trees,
                 'done_trees'=>$done_trees,
                 'false_trees'=>$false_trees,
-                'pinding_trees'=>$pinding_trees
+                'pinding_trees'=>$pinding_trees,
+                'lastpage_ptrees'=>$lastpage_ptrees,
+                'lastpage_wtrees'=>$lastpage_wtrees,
+                'lastpage_dtrees'=>$lastpage_dtrees,
+                'lastpage_ftrees'=>$lastpage_ftrees
             ],200);  
         } catch(Exception $err) {
             return response()->json(["message"=>$err->getMessage()],500);
@@ -236,8 +288,13 @@ class VolunteerController extends Controller
     public function getAllVolunteers(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $data=VolunteerResource::collection(Volunteer::where('id','!=',auth()->user()->volunteer->id)->where('isApproved','yes')->latest()->paginate($numItems));
-            return response()->json(['allVolunteers'=>$data],200);
+            $data=Volunteer::where('id','!=',auth()->user()->volunteer->id)->where('isApproved','yes')->latest()->paginate($numItems);
+            
+            $volunteers=VolunteerResource::collection($data);
+            
+            $lastpage_volunteers=$data->lastPage();
+
+            return response()->json(['allVolunteers'=>$volunteers,'lastpage_volunteers'=>$lastpage_volunteers],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }
@@ -256,8 +313,14 @@ class VolunteerController extends Controller
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of category not correct"],422);
             $numItems=$req->per_page??10;  
-            $data=PostResource::collection(Article::where('category_id',$id)->latest()->paginate($numItems));
-            return response()->json(['allArticles'=>$data],200);
+
+            $data=Article::where('category_id',$id)->latest()->paginate($numItems);
+
+            $art=PostResource::collection($data);
+
+            $lastpage_art=$data->lastPage();
+            
+            return response()->json(['allArticles'=>$art,'lastpage_art'=>$lastpage_art],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }
@@ -265,9 +328,22 @@ class VolunteerController extends Controller
     public function getAllAdminAss(Request $req){
         try{
             $numItems=$req->per_page??10;
-            $allassAdmin=AdminassResource::collection(User::where('role','adminAss')->latest()->paginate($numItems));
-            $allAdmin=AdminassResource::collection(User::where('role','admin')->latest()->paginate($numItems));
-            return response()->json(['allAdminAss'=>$allassAdmin,'allAdmin'=>$allAdmin],200);
+
+            $assAdmin=User::where('role','adminAss')->latest()->paginate($numItems);
+            $admin=User::where('role','admin')->latest()->paginate($numItems);
+
+            $allassAdmin=AdminassResource::collection($assAdmin);
+            $allAdmin=AdminassResource::collection($admin);
+
+            $lastpage_admin=$admin->lastPage();
+            $lastpage_assadmin=$assAdmin->lastPage();
+
+            return response()->json([
+                'allAdminAss'=>$allassAdmin,
+                'allAdmin'=>$allAdmin,
+                'lastpage_admin'=>$lastpage_admin,
+                'lastpage_assadmin'=>$lastpage_assadmin
+            ],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
         }
