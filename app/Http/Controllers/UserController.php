@@ -436,12 +436,14 @@ class UserController extends Controller
             $doneTree = AdvertisementsResource::collection(Advertisement::where('status','done')->orderBy('id', 'desc')->paginate(15));
             $notDoneTree = AdvertisementsResource::collection(Advertisement::where('status','wait')->orderBy('id', 'desc')->paginate(15));
             $articles = PostResource::collection(Article::orderBy('id', 'desc')->paginate(5));
+            $volunteers = VolunteerResource::collection(Volunteer::orderBy('id', 'desc')->paginate(3));
             return response()->json([
                 'doneWork'=>$doneWork,
                 'notDoneWork'=>$notDoneWork,
                 'doneTree'=>$doneTree,
                 'notDoneTree'=>$notDoneTree,
-                'articles'=>$articles
+                'articles'=>$articles,
+                'volunteers'=>$volunteers
             ],200);
         } catch(Exception $err){
               return response()->json(["message"=>$err->getMessage()],500);
