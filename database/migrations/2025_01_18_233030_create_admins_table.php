@@ -17,7 +17,7 @@ return new class extends Migration
             $table->mediumText('desc');
             $table->string('address');
             $table->string('phone');
-            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -59,6 +59,7 @@ Route::middleware('allow','checkPlanWork')->group(function(){
         Route::post('/createcategory',[AdminController::class,'createcategory']);
         Route::post('/updateCategory/{id}',[AdminController::class,'updateCategory']);
         Route::post('/createArticles/{id}',[AdminController::class,'createArticles']);
+        Route::post('/openTreeOrWork',[AdminController::class,'openTreeOrWork']);// new
 
         Route::delete('/deleteAssAdmin/{id}',[AdminController::class,'deleteAssAdmin'])->middleware('isAdmin');
         Route::delete('/deleteVolunteer/{id}',[AdminController::class,'deleteVolunteer']);

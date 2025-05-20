@@ -32,15 +32,24 @@ class UploadImageController extends Controller
         }
     }
     public function deleteMultiImage($imgs){
-        if($imgs)
-            foreach($imgs as $img)    
-                if($img->img!="no image"){
-                    $image_path =explode("/images/",$img->img);
-                    $imgDel=public_path("/images/".$image_path[1]);
-                    if(File::exists($imgDel)) {
-                        File::delete($imgDel);
-                    }
-                    $img->delete();
+        foreach($imgs as $img)    
+            if($img->img!="no image"){
+                $image_path =explode("/images/",$img->img);
+                $imgDel=public_path("/images/".$image_path[1]);
+                if(File::exists($imgDel)) {
+                    File::delete($imgDel);
                 }
+                $img->delete();
+            }
+    }
+    public function deleteMultiImagePaths($imgs){
+        foreach($imgs as $img)    
+            if($img!="no image"){
+                $image_path =explode("/images/",$img->img);
+                $imgDel=public_path("/images/".$image_path[1]);
+                if(File::exists($imgDel)) {
+                    File::delete($imgDel);
+                }
+            }
     }
 }

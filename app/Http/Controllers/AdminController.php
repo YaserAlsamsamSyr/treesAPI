@@ -450,10 +450,15 @@ class AdminController extends Controller
     }
     //
     public function createAdmin(AdminRequest $req){
+         $userId='';
+         $iamges=[];
+         $logoImg='';
          try{
             $imgName="no image";
-            if($req->hasFile('logo'))
-                  $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+            if($req->hasFile('logo')){
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $logoImg=$imgName;
+            }
             $user = User::create([
                 'name' => $req->name,
                 'email' => $req->email,
@@ -461,6 +466,7 @@ class AdminController extends Controller
                 'logo'=>$imgName,
                 'role'=>'admin'
             ]);
+            $userId=$user->id;
             $admin=new Admin();
             $admin->orgName=$req->orgName;
             $admin->desc=$req->desc;
@@ -470,13 +476,25 @@ class AdminController extends Controller
             if($req->hasFile('imgs')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
                 $user->admin->images()->saveMany($paths);
+                $iamges=$paths;
             }
             return response()->json(["message"=>"create success"],201);
          }catch(Exception $err){
+            if($userId!=''){
+                $user=User::find($userId);
+                if($user)
+                    $user->delete();
+            }
+            if($logoImg!='')
+                (new UploadImageController())->deleteLogoImage($logoImg);
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
             return response()->json(["message"=>$err->getMessage()],500);
          }
     }
     public function updateAdmin(UpdateAdminRequest $req,string $id){
+        $iamges=[];
+        $logoImg='';
         try{
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
@@ -487,35 +505,45 @@ class AdminController extends Controller
             $user[0]->name=$req->name??$user[0]->name;
             if($req->password)
                 $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
-
+            if($req->hasFile('logo')){
+                (new UploadImageController())->deleteLogoImage($user[0]->logo);
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $logoImg=$imgName;
+                $user[0]->logo=$imgName;
+            }
+            $user[0]->save();
             $user[0]->admin->orgName=$req->orgName??$user[0]->admin->orgName;
             $user[0]->admin->desc=$req->desc??$user[0]->admin->desc;
             $user[0]->admin->address=$req->address??$user[0]->admin->address;
             $user[0]->admin->phone=$req->phone??$user[0]->admin->phone;
+            $user[0]->admin->save();
 
-            if($req->hasFile('logo')){
-                (new UploadImageController())->deleteLogoImage($user[0]->logo);
-                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
-                $user[0]->logo=$imgName;
-            }
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                $iamges=$paths;
                 $user[0]->admin->images()->saveMany($paths);
             }
-            $user[0]->admin->save();
-            $user[0]->save();
             return response()->json(["message"=>"update success"],200);
         }catch(Exception $err){
+            if($logoImg!='')
+                (new UploadImageController())->deleteLogoImage($logoImg);
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
     // AssAdmin
     public function createAssAdmin(AdminRequest $req){
+            $userId='';
+            $iamges=[];
+            $logoImg='';
             try{
                 $imgName="no image";
-                if($req->hasFile('logo'))
-                      $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                if($req->hasFile('logo')){
+                    $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                    $logoImg=$imgName;
+                }
                 $user = User::create([
                     'name' => $req->name,
                     'email' => $req->email,
@@ -524,6 +552,7 @@ class AdminController extends Controller
                     'role'=>'adminAss',
                     'user_id'=>auth()->id()
                 ]);
+                $userId=$user->id;
                 $admin=new Admin();
                 $admin->orgName=$req->orgName;
                 $admin->desc=$req->desc;
@@ -532,10 +561,20 @@ class AdminController extends Controller
                 $user->admin()->save($admin);
                 if($req->hasFile('imgs')){
                     $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                    $iamges=$paths;
                     $user->admin->images()->saveMany($paths);
                 }
                 return response()->json(["message"=>"create success"],201);
             }catch(Exception $err){
+                if($userId!=''){
+                    $user=User::find($userId);
+                    if($user)
+                        $user->delete();
+                }
+                if($logoImg!='')
+                    (new UploadImageController())->deleteLogoImage($logoImg);
+                if(sizeof($iamges)!=0)
+                    (new UploadImageController())->deleteMultiImagePaths($iamges);
                 return response()->json(["message"=>$err->getMessage()],500);
             }
     }
@@ -548,7 +587,7 @@ class AdminController extends Controller
             if(sizeof($user)==0)
                 return response()->json(["message"=>"this AssAdmin not found"],404);
             (new UploadImageController())->deleteLogoImage($user[0]->logo);
-            (new UploadImageController())->deleteMultiImage($user[0]->images);
+            (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
             $user[0]->delete();          
             return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){
@@ -556,6 +595,8 @@ class AdminController extends Controller
         }  
     }
     public function updateAssAdmin(UpdateAdminRequest $req,string $id){
+        $iamges=[];
+        $logoImg='';
         try{
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
@@ -566,35 +607,46 @@ class AdminController extends Controller
             $user[0]->name=$req->name??$user[0]->name;
             if($req->password)
                 $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
+             if($req->hasFile('logo')){
+                (new UploadImageController())->deleteLogoImage($user[0]->logo);
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $logoImg=$imgName;
+                $user[0]->logo=$imgName;
+            }
+            $user[0]->save();
 
             $user[0]->admin->orgName=$req->orgName??$user[0]->admin->orgName;
             $user[0]->admin->desc=$req->desc??$user[0]->admin->desc;
             $user[0]->admin->address=$req->address??$user[0]->admin->address;
             $user[0]->admin->phone=$req->phone??$user[0]->admin->phone;
-
-            if($req->hasFile('logo')){
-                (new UploadImageController())->deleteLogoImage($user[0]->logo);
-                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
-                $user[0]->logo=$imgName;
-            }
+            $user[0]->admin->save();
+           
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                $iamges=$paths;
                 $user[0]->admin->images()->saveMany($paths);
             }
-            $user[0]->admin->save();
-            $user[0]->save();
             return response()->json(["message"=>"update success"],200);
         }catch(Exception $err){
+            if($logoImg!='')
+                (new UploadImageController())->deleteLogoImage($logoImg);
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
     //volunteer
     public function createVolunteer(VolunteerRequest $req){
+        $userId='';
+        $logoImg='';
         try{
             $imgName="no image";
-            if($req->hasFile('logo'))
+            if($req->hasFile('logo')){
                 $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $logoImg=$imgName;
+            }
+            $user='';
             if($req->email)
                 $user = User::create([
                     'name' => $req->name,
@@ -614,6 +666,7 @@ class AdminController extends Controller
                     'role'=>'volun',
                     'user_id'=>auth()->id()
                 ]);
+            $userId=$user->id;
             $volun=new Volunteer();
             $volun->mac="no mac";
             $volun->desc=$req->desc;
@@ -625,6 +678,13 @@ class AdminController extends Controller
             $user->volunteer()->save($volun);
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){
+            if($userId!=''){
+                $user=User::find($userId);
+                if($user)
+                    $user->delete();
+            }
+            if($logoImg!='')
+                (new UploadImageController())->deleteLogoImage($logoImg);
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
@@ -644,6 +704,7 @@ class AdminController extends Controller
         }  
     }
     public function updateVolunteer(UpdateVolunterRequest $req,string $id){
+        $logoImg='';
         try{
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
@@ -655,27 +716,38 @@ class AdminController extends Controller
             $user[0]->email=$req->email??$user[0]->email;
             if($req->password)
                 $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
-            $user[0]->volunteer->desc=$req->desc??$user[0]->volunteer->desc;
-            $user[0]->volunteer->address=$req->address??$user[0]->volunteer->address;
-            $user[0]->volunteer->phone=$req->phone??$user[0]->volunteer->phone;
             if($req->hasFile('logo')){
                 (new UploadImageController())->deleteLogoImage($user[0]->logo);
                 $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $logoImg=$imgName;
                 $user[0]->logo=$imgName;
             }
-            $user[0]->volunteer->save();
             $user[0]->save();
+
+            $user[0]->volunteer->desc=$req->desc??$user[0]->volunteer->desc;
+            $user[0]->volunteer->address=$req->address??$user[0]->volunteer->address;
+            $user[0]->volunteer->phone=$req->phone??$user[0]->volunteer->phone;
+            $user[0]->volunteer->save();
+
             return response()->json(["message"=>"update success"],200);
         } catch(Exception $err){
+            if($logoImg!='')
+                (new UploadImageController())->deleteLogoImage($logoImg);
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
     //planstore
     public function createPlanstore(PlantsStoreRequest $req){
+           $userId='';
+           $logoImg='';
+           $iamges=[];
            try{
                 $imgName="no image";
-                if($req->hasFile('logo'))
+                if($req->hasFile('logo')){
                       $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                      $logoImg=$imgName;
+                    }
+                $user='';
                 if($req->email)
                     $user = User::create([
                         'name' => $req->name,
@@ -695,6 +767,7 @@ class AdminController extends Controller
                         'role'=>'plan',
                         'user_id'=>auth()->id()
                     ]);
+                $userId=$user->id;
                 $planstore=new Planstore();
                 $planstore->mac="no mac";
                 $planstore->ownerName=$req->ownerName;
@@ -709,10 +782,20 @@ class AdminController extends Controller
                 $user->planstore()->save($planstore);
                 if($req->hasFile('imgs')){
                     $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                    $iamges=$paths;
                     $user->planstore->images()->saveMany($paths);
                 }
                 return response()->json(["message"=>"create success"],201);
            }catch(Exception $err){
+                if($userId!=''){
+                    $user=User::find($userId);
+                    if($user)
+                        $user->delete();
+                }
+                if($logoImg!='')
+                    (new UploadImageController())->deleteLogoImage($logoImg);
+                if(sizeof($iamges)!=0)
+                    (new UploadImageController())->deleteMultiImagePaths($iamges);
                  return response()->json(["message"=>$err->getMessage()],500);
            }
     }
@@ -727,8 +810,10 @@ class AdminController extends Controller
             (new UploadImageController())->deleteLogoImage($user[0]->logo);
             (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
             foreach ($user[0]->planstore->advertisements as $tree)
-                if($tree->status=="متوفر")
-                    $tree->status->delete();
+                if($tree->status=="متوفر"){
+                    (new UploadImageController())->deleteMultiImage($tree->images);
+                    $tree->delete();
+                }
             $user[0]->delete();          
             return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){
@@ -736,6 +821,8 @@ class AdminController extends Controller
         }  
     }
     public function updatePlanstore(UpdatePlantsStoreRequest $req,string $id){
+        $logoImg='';
+        $iamges=[];
         try{
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
@@ -747,31 +834,42 @@ class AdminController extends Controller
             $user[0]->email=$req->email??$user[0]->email;
             if($req->password)
                 $user[0]->password=Hash::make($req->string('password'))??$user[0]->password;
+            if($req->hasFile('logo')){
+                (new UploadImageController())->deleteLogoImage($user[0]->logo);
+                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
+                $logoImg=$imgName;
+                $user[0]->logo=$imgName;
+            }
+            $user[0]->save();
+
             $user[0]->planstore->desc=$req->desc??$user[0]->planstore->desc;
             $user[0]->planstore->address=$req->address??$user[0]->planstore->address;
             $user[0]->planstore->phone=$req->phone??$user[0]->planstore->phone;
             $user[0]->planstore->ownerName=$req->ownerName??$user[0]->planstore->ownerName;
             $user[0]->planstore->openTime=$req->openTime??$user[0]->planstore->openTime;
             $user[0]->planstore->closeTime=$req->closeTime??$user[0]->planstore->closeTime;
-            if($req->hasFile('logo')){
-                (new UploadImageController())->deleteLogoImage($user[0]->logo);
-                $imgName=(new UploadImageController())->uploadeImage($req->file('logo'));
-                $user[0]->logo=$imgName;
-            }
+            $user[0]->planstore->save();
+            
             if($req->hasFile('imgs')){
                 (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                $iamges=$paths;
                 $user[0]->planstore->images()->saveMany($paths);
             }
-            $user[0]->planstore->save();
-            $user[0]->save();
             return response()->json(["message"=>"update success"],200);
         } catch(Exception $err){
+            if($logoImg!='')
+                (new UploadImageController())->deleteLogoImage($logoImg);
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
             return response()->json(["message"=>$err->getMessage()],500);
         }
     }
     //tree
     public function createTree(AdvertisementsRequest $req,string $id){
+        $userId='';
+        $treeId='';
+        $iamges=[];
         try{
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
@@ -785,15 +883,30 @@ class AdminController extends Controller
             $tree->desc = $req->desc;
             $tree->planstore_id=$user[0]->planstore->id;
             $tree->save();
+            $treeId=$tree->id;
             $user[0]->planstore->rate++;
             $user[0]->planstore->save();
+            $userId=$user->id;
             if($req->hasFile('images')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
+                $iamges=$paths;
                 $tree->images()->saveMany($paths);
             }
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){
-              return response()->json(["message"=>$err->getMessage()],500);
+            if($userId!=''){
+                $user=User::where('role','plan')->where('id',$id)->get();
+                $user[0]->planstore->rate--;
+                $user[0]->planstore->save();
+            }
+            if($treeId!=''){
+                $tree=Advertisement::find($treeId);
+                if($tree)
+                    $tree->delete();
+            }
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
+            return response()->json(["message"=>$err->getMessage()],500);
         }
     }
     public function deleteTree(string $id){
@@ -812,6 +925,7 @@ class AdminController extends Controller
         }  
     }
     public function updateTree(UpdateAdvertisementsRequest $req,string $id){
+        $iamges=[];
          try{
              $pattern = "/^[0-9]+$/";
              if(!preg_match($pattern, $id))
@@ -822,15 +936,18 @@ class AdminController extends Controller
              $tree[0]->name=$req->name??$tree[0]->name;
              $tree[0]->desc=$req->desc??$tree[0]->desc;
              $tree[0]->plantsStoreName=$req->plantsStoreName??$tree[0]->plantsStoreName;
+             $tree[0]->save();
              if($req->hasFile('imgs')){
                  (new UploadImageController())->deleteMultiImage($tree[0]->images);
                  $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                 $iamges=$paths;
                  $tree[0]->images()->saveMany($paths);
              }
-             $tree[0]->save();
              return response()->json(["message"=>"update success"],200);
          } catch(Exception $err){
-             return response()->json(["message"=>$err->getMessage()],500);
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
+            return response()->json(["message"=>$err->getMessage()],500);
          }
     }
     //category
@@ -883,6 +1000,7 @@ class AdminController extends Controller
            $work=Work::where('id',$id)->get();
            if(sizeof($work)==0)
                return response()->json(["message"=>"this work not found"],404);
+            (new UploadImageController())->deleteMultiImage($work[0]->images);
             $work[0]->delete();
            return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){
@@ -891,6 +1009,8 @@ class AdminController extends Controller
     }
     //articles
     public function createArticles(ArticleRequest $req,string $id){
+        $iamges=[];
+        $artId='';
         try{
             $pattern = "/^[0-9]+$/";
             if(!preg_match($pattern, $id))
@@ -903,12 +1023,20 @@ class AdminController extends Controller
             $art->desc=$req->desc;
             $art->category_id=$cat[0]->id;
             $art->save();
+            $artId=$art->id;
             if($req->hasFile('images')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
+                $iamges=$paths;
                 $art->images()->saveMany($paths);
             }
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){
+            if($artId!='')
+                $art=Article::find($artId);
+                if($art)
+                    $art->delete();
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
@@ -952,6 +1080,8 @@ class AdminController extends Controller
         }  
     }
     public function createEvent(EventRequest $req){
+        $iamges=[];
+        $eventId='';
         try{
             $event=new Event();
             $event->title=$req->title;
@@ -963,13 +1093,60 @@ class AdminController extends Controller
             $event->endDate=$req->endDate;
             $event->admin_id=auth()->id();
             $event->save();
+            $eventId=$event->id;
             if($req->hasFile('images')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
+                $iamges=$paths;
                 $event->images()->saveMany($paths);
             }
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){
+            if($eventId!='')
+                $even=Event::find($eventId);
+                if($even)
+                    $even->delete();
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
               return response()->json(["message"=>$err->getMessage()],500);
         }
+    }
+    // open tree or work to glopal
+    public function openTreeOrWork(Request $req){
+        try{
+            $type=$req->type;
+            $id=$req->id;
+            $pattern = "/^[0-9]+$/";
+            if(!preg_match($pattern, $id))
+                return response()->json(["message"=>"id not correct"],422);
+            if($type=="tree"){
+                try{
+                    $trees=Advertisement::where('status','pin')->where('id',$id)->get();
+                } catch(Exception $err) {
+                    $trees=Advertisement::where('status','pin')->where('id',$id)->get();
+                }
+                if(sizeof($trees)==0)
+                    return response()->json(["message"=>"this tree not found"],404);
+                $trees[0]->volunteer_id=null;
+                $trees[0]->status="wait";
+                $trees[0]->save();
+            } else if($type=="work"){
+                try{
+                    $works=Work::where('status','pin')->where('id',$id)->get();
+                } catch(Exception $err) {
+                    $works=Work::where('status','pin')->where('id',$id)->get();
+                }
+                if(sizeof($works)==0)
+                    return response()->json(["message"=>"this work not found"],404);
+                $works[0]->volunteer_id=null;
+                $works[0]->status="wait";
+                $works[0]->save();
+            }
+            else
+                return response()->json(["message"=>"type not correct"],422);
+            return response()->json(["message"=>"operation success"],200);
+        } catch(Exception $err){
+            return response()->json(["message"=>$err->getMessage()],500);
+        }
+
     }
 }

@@ -89,6 +89,9 @@ class PlantsStoreController extends Controller
         }
     }
     public function createTree(AdvertisementsRequest $req){
+        $userId='';
+        $treeId='';
+        $iamges=[];
         try{
             $tree=new Advertisement();
             $tree->name = $req->name;
@@ -96,14 +99,29 @@ class PlantsStoreController extends Controller
             $tree->desc = $req->desc;
             $tree->planstore_id=auth()->user()->planstore->id;
             $tree->save();
+            $treeId=$tree->id;
             auth()->user()->planstore->rate++;
             auth()->user()->planstore->save();
+            $userId=auth()->id();
             if($req->hasFile('images')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
+                $iamges=$paths;
                 $tree->images()->saveMany($paths);
             }
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){
+            if($userId!=''){
+                $user=User::where('role','plan')->where('id',$id)->get();
+                $user[0]->planstore->rate--;
+                $user[0]->planstore->save();
+            }
+            if($treeId!=''){
+                $tree=Advertisement::find($treeId);
+                if($tree)
+                    $tree->delete();
+            }
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
               return response()->json(["message"=>$err->getMessage()],500);
         }
     }
@@ -123,6 +141,7 @@ class PlantsStoreController extends Controller
         }  
     }
     public function updateTree(UpdateAdvertisementsRequest $req,string $id){
+        $iamges=[];
          try{
              $pattern = "/^[0-9]+$/";
              if(!preg_match($pattern, $id))
@@ -133,15 +152,18 @@ class PlantsStoreController extends Controller
              $tree[0]->name=$req->name??$tree[0]->name;
              $tree[0]->desc=$req->desc??$tree[0]->desc;
              $tree[0]->plantsStoreName=$req->plantsStoreName??$tree[0]->plantsStoreName;
+             $tree[0]->save();
              if($req->hasFile('imgs')){
                  (new UploadImageController())->deleteMultiImage($tree[0]->images);
                  $tree[0]->images->delete();
                  $paths=(new UploadImageController())->uploadMultiImages($req->file('imgs'));
+                 $iamges=$paths;
                  $tree[0]->images()->saveMany($paths);
              }
-             $tree[0]->save();
              return response()->json(["message"=>"update success"],200);
          } catch(Exception $err){
+            if(sizeof($iamges)!=0)
+                (new UploadImageController())->deleteMultiImagePaths($iamges);
              return response()->json(["message"=>$err->getMessage()],500);
          }
     }

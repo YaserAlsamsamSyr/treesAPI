@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->string('img');
-            $table->foreignId('article_id')->nullable()->references('id')->on('articles')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('advertisement_id')->nullable()->references('id')->on('advertisements')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('admin_id')->nullable()->references('id')->on('admins')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('event_id')->nullable()->references('id')->on('events')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('work_id')->nullable()->references('id')->on('works')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('planstore_id')->nullable()->references('id')->on('planstores')->onDelete('cascade')->onUpdate('cascade');         
+            $table->foreignId('article_id')->nullable()->references('id')->on('articles')->onDelete('cascade');
+            $table->foreignId('advertisement_id')->nullable()->references('id')->on('advertisements')->onDelete('cascade');
+            $table->foreignId('admin_id')->nullable()->references('id')->on('admins')->onDelete('cascade');
+            $table->foreignId('event_id')->nullable()->references('id')->on('events')->onDelete('cascade');
+            $table->foreignId('work_id')->nullable()->references('id')->on('works')->onDelete('cascade');
+            $table->foreignId('planstore_id')->nullable()->references('id')->on('planstores')->onDelete('cascade');         
             $table->timestamps();
         });
     }
