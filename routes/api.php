@@ -10,7 +10,7 @@ Route::get('/', function () {
     return ['message' => "trees system"];
 });
 
-Route::middleware('allow','checkPlanWbork')->group(function(){
+Route::middleware(['allow','checkPlanWork'])->group(function(){
 
     Route::get('/logout',function(Request $req){
         try{

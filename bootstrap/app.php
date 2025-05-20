@@ -24,7 +24,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
             'checkPlanWork'=>\App\Http\Middleware\CheckWorkPlanMiddleware::class,
         ]);
-
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
