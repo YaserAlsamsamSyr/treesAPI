@@ -10,7 +10,7 @@ Route::get('/', function () {
     return ['message' => "trees system"];
 });
 
-Route::middleware('allow','checkPlanWork')->group(function(){
+Route::middleware('allow','checkPlanWbork')->group(function(){
 
     Route::get('/logout',function(Request $req){
         try{
@@ -59,7 +59,7 @@ Route::middleware('allow','checkPlanWork')->group(function(){
         Route::post('/createcategory',[AdminController::class,'createcategory']);
         Route::post('/updateCategory/{id}',[AdminController::class,'updateCategory']);
         Route::post('/createArticles/{id}',[AdminController::class,'createArticles']);
-        Route::post('/openTreeOrWork',[AdminController::class,'openTreeOrWork']);// new
+        Route::post('/openTreeOrWork',[AdminController::class,'openTreeOrWork']);
 
         Route::delete('/deleteAssAdmin/{id}',[AdminController::class,'deleteAssAdmin'])->middleware('isAdmin');
         Route::delete('/deleteVolunteer/{id}',[AdminController::class,'deleteVolunteer']);

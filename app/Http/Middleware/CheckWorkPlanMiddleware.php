@@ -19,13 +19,13 @@ class CheckWorkPlanMiddleware
     public function handle(Request $request, Closure $next): Response
     {
 
-        $trees=Advertisement::where('status','pin')->where( 'created_at', '<', Carbon::now()->subDays(10))->get();
+        $trees=Advertisement::where('status','pin')->where( 'updated_at', '<', Carbon::now()->subDays(10))->get();
         for($i=0;$i<count($trees);$i++){
             $trees[$i]->volunteer_id=null;
             $trees[$i]->status="wait";
             $trees[$i]->save();
         }
-        $works=Work::where('status','pin')->where( 'created_at', '<', Carbon::now()->subDays(10))->get();
+        $works=Work::where('status','pin')->where( 'updated_at', '<', Carbon::now()->subDays(10))->get();
         for($i=0;$i<count($works);$i++){
             $works[$i]->volunteer_id=null;
             $works[$i]->status="wait";
