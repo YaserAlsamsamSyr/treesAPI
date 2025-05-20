@@ -153,12 +153,21 @@ class AdminController extends Controller
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of planstore not correct"],422);
             $numItems=$req->per_page??10;
-
-            $ptrees=Advertisement::where('planstore_id',$id)->where('status','pin')->latest()->paginate($numItems);
-            $wtrees=Advertisement::where('planstore_id',$id)->where('status','wait')->latest()->paginate($numItems);
-            $dtrees=Advertisement::where('planstore_id',$id)->where('status','done')->latest()->paginate($numItems);
-            $ftrees=Advertisement::where('planstore_id',$id)->where('status','false')->latest()->paginate($numItems);
-
+            $ptrees='';
+            $wtrees='';
+            $dtrees='';
+            $ftrees='';
+            if($id!=-1) {
+                $ptrees=Advertisement::where('planstore_id',$id)->where('status','pin')->latest()->paginate($numItems);
+                $wtrees=Advertisement::where('planstore_id',$id)->where('status','wait')->latest()->paginate($numItems);
+                $dtrees=Advertisement::where('planstore_id',$id)->where('status','done')->latest()->paginate($numItems);
+                $ftrees=Advertisement::where('planstore_id',$id)->where('status','false')->latest()->paginate($numItems);
+            } else{
+                $ptrees=Advertisement::where('status','pin')->latest()->paginate($numItems);
+                $wtrees=Advertisement::where('status','wait')->latest()->paginate($numItems);
+                $dtrees=Advertisement::where('status','done')->latest()->paginate($numItems);
+                $ftrees=Advertisement::where('status','false')->latest()->paginate($numItems);
+            }
             $pinding_trees=AdvertisementsResource::collection($ptrees);
             $waiting_trees=AdvertisementsResource::collection($wtrees);
             $done_trees=AdvertisementsResource::collection($dtrees);
