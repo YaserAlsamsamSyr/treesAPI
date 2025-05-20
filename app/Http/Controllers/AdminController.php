@@ -877,12 +877,12 @@ class AdminController extends Controller
             $user=User::where('role','plan')->where('id',$id)->get();
             if(sizeof($user)==0)
                 return response()->json(["message"=>"this planstore not found"],404);
-            $tree=Advertisement::create([
-                'name'=>$req->name,
-                'desc'=>$req->desc,
-                'plantsStoreName'=>$user[0]->name,
-                'planstore_id'=>$user[0]->planstore->id
-            ]);
+            $tree=new Advertisement();
+            $tree->name=$req->name;
+            $tree->desc=$req->desc;
+            $tree->plantsStoreName=$user[0]->name;
+            $tree->planstore_id=$user[0]->planstore->id;
+            $tree->save();
             $treeId=$tree->id;
             $user[0]->planstore->rate++;
             $user[0]->planstore->save();
