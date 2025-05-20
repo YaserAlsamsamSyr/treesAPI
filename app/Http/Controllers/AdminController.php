@@ -149,7 +149,7 @@ class AdminController extends Controller
     //---plan-id,volun-id
     public function getPlanstoreTrees(Request $req,string $id){
         try {
-            $pattern = "/^[0-9]+$/";
+            $pattern = "/^(([0-9]+)|(-[0-9]+))$/";
             if(!preg_match($pattern, $id))
                  return response()->json(["message"=>"id of planstore not correct"],422);
             $numItems=$req->per_page??10;
