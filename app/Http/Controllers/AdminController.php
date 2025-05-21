@@ -147,7 +147,7 @@ class AdminController extends Controller
         }
     }
     //---plan-id,volun-id
-    public function getPlanstoreTrees(Request $req,string $id){
+    public function getPlanstoreTrees(Request $req,string $id){ 
         try {
             $pattern = "/^(([0-9]+)|(-[0-9]+))$/";
             if(!preg_match($pattern, $id))
@@ -819,9 +819,12 @@ class AdminController extends Controller
             (new UploadImageController())->deleteLogoImage($user[0]->logo);
             (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
             foreach ($user[0]->planstore->advertisements as $tree)
-                if($tree->status=="متوفر"){
+                if($tree->status=="wait"){
                     (new UploadImageController())->deleteMultiImage($tree->images);
                     $tree->delete();
+                } else{
+                    $tree->planstore_id=null;
+                    $tree->save();
                 }
             $user[0]->delete();          
             return response()->json(["message"=>"delete success"],200);
