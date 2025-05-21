@@ -706,6 +706,24 @@ class AdminController extends Controller
             if(sizeof($user)==0)
                 return response()->json(["message"=>"this volunteer not found"],404);
             (new UploadImageController())->deleteLogoImage($user[0]->logo);
+            foreach ($user[0]->volunteer->advertisements as $tree)
+                if($tree->status=="done"||$tree->status=="false"){
+                    (new UploadImageController())->deleteMultiImage($tree->images);
+                    $tree->delete();
+                } else if($tree->status=="pin"){
+                    $tree->volunteer_id=null;
+                    $tree->status="wait";
+                    $tree->save();
+                }
+            foreach ($user[0]->volunteer->works as $work)
+                if($work->status=="done"||$work->status=="false"){
+                    (new UploadImageController())->deleteMultiImage($work->images);
+                    $work->delete();
+                } else if($work->status=="pin"){
+                    $work->volunteer_id=null;
+                    $work->status="wait";
+                    $work->save();
+                }
             $user[0]->delete();          
             return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){
@@ -819,7 +837,7 @@ class AdminController extends Controller
             (new UploadImageController())->deleteLogoImage($user[0]->logo);
             (new UploadImageController())->deleteMultiImage($user[0]->planstore->images);
             foreach ($user[0]->planstore->advertisements as $tree)
-                if($tree->status=="wait"){
+                if($tree->status=="wait"||$tree->status=="pin"){
                     (new UploadImageController())->deleteMultiImage($tree->images);
                     $tree->delete();
                 } else{
