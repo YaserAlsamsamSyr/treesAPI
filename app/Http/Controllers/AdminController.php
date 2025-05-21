@@ -597,6 +597,14 @@ class AdminController extends Controller
                 return response()->json(["message"=>"this AssAdmin not found"],404);
             (new UploadImageController())->deleteLogoImage($user[0]->logo);
             (new UploadImageController())->deleteMultiImage($user[0]->admin->images);
+            foreach ($user[0]->admin->events as $event) {
+                    $event->admin_id=null;
+                    $event->save();
+            }
+            foreach ($user[0]->admin->categories as $category) {
+                    $category->admin_id=null;
+                    $category->save();
+            }
             $user[0]->delete();          
             return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){

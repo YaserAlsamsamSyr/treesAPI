@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('endDate');
             $table->string('orgName');
             $table->string('orgOwnerName');
-            $table->foreignId('admin_id')->references('id')->on('admins');
+            $table->foreignId('admin_id')->nullable()->references('id')->on('admins');
             $table->timestamps();
         });
     }
