@@ -477,7 +477,7 @@ class UserController extends Controller
             $doneTree = AdvertisementsResource::collection(Advertisement::where('status','done')->orderBy('id', 'desc')->paginate(15));
             $notDoneTree = AdvertisementsResource::collection(Advertisement::where('status','wait')->orderBy('id', 'desc')->paginate(15));
             $articles = PostResource::collection(Article::orderBy('id', 'desc')->paginate(5));
-            $volunteers = VolunteerResource::collection(Volunteer::orderBy('id', 'desc')->paginate(3));
+            $volunteers = VolunteerResource::collection(Volunteer::where('isApproved','yes')->orderBy('id', 'desc')->paginate(3));
             return response()->json([
                 'doneWork'=>$doneWork,
                 'notDoneWork'=>$notDoneWork,
