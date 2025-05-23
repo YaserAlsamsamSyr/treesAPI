@@ -6,7 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VolunteerController;
 use Illuminate\Http\Request;
 
-Route::get('/', function () {
+Route::get('/', function () {       
     return ['message' => "trees system"];
 });
 

@@ -1121,16 +1121,16 @@ class AdminController extends Controller
         $iamges=[];
         $eventId='';
         try{
-            $event=new Event();
-            $event->title=$req->title;
-            $event->address=$req->address;
-            $event->desc=$req->desc;
-            $event->orgName=$req->orgName;
-            $event->orgOwnerName=$req->orgOwnerName;
-            $event->startDate=$req->startDate;
-            $event->endDate=$req->endDate;
-            $event->admin_id=auth()->id();
-            $event->save();
+            $event=Event::create([
+                "title"=>$req->title,
+                "address"=>$req->address,
+                "desc"=>$req->desc,
+                "orgName"=>$req->orgName,
+                "orgOwnerName"=>$req->orgOwnerName,
+                "startDate"=>$req->startDate,
+                "endDate"=>$req->endDate,
+                "admin_id"=>auth()->id()
+            ]);
             $eventId=$event->id;
             if($req->hasFile('images')){
                 $paths=(new UploadImageController())->uploadMultiImages($req->file('images'));
