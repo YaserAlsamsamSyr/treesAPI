@@ -1008,9 +1008,8 @@ class AdminController extends Controller
            $cat=Category::where('id',$id)->get();
            if(sizeof($cat)==0)
                return response()->json(["message"=>"this category not found"],404);
-            for($i=0;$i<sizeof($cat);$i++)
-                for($j=0;$j<$cat[$i]->articles;$j++)
-                        (new UploadImageController())->deleteMultiImage($cat[$i]->articles[$j]->images);
+                for($j=0;$j<sizeof($cat[0]->articles);$j++)
+                        (new UploadImageController())->deleteMultiImage($cat[0]->articles[$j]->images);
             $cat[0]->delete();
            return response()->json(["message"=>"delete success"],200);
         } catch(Exception $err){
