@@ -1139,10 +1139,11 @@ class AdminController extends Controller
             }
             return response()->json(["message"=>"create success"],201);
         }catch(Exception $err){
-            if($eventId!='')
+            if($eventId!=''){
                 $even=Event::find($eventId);
                 if($even)
                     $even->delete();
+            }
             if(sizeof($iamges)!=0)
                 (new UploadImageController())->deleteMultiImagePaths($iamges);
               return response()->json(["message"=>$err->getMessage()],500);
