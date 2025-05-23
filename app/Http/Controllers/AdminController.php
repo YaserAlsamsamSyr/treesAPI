@@ -1128,8 +1128,7 @@ class AdminController extends Controller
                 "orgName"=>$req->orgName,
                 "orgOwnerName"=>$req->orgOwnerName,
                 "startDate"=>$req->startDate,
-                "endDate"=>$req->endDate,
-                "admin_id"=>auth()->id()
+                "endDate"=>$req->endDate
             ]);
             $eventId=$event->id;
             if($req->hasFile('images')){
